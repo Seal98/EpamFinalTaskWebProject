@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import by.epam.training.web.bean.User;
 import by.epam.training.web.exception.ServiceException;
 import by.epam.training.web.service.ClientService;
 import by.epam.training.web.service.ServiceFactory;
@@ -26,7 +27,9 @@ public class SignIn implements Command {
 		String password = request.getParameter(Command.passwordParameter);
 		RequestDispatcher rd = null;
 		try {
-		clientService.signIn(login, password);
+		User existingUser = clientService.signIn(login, password);
+		request.setAttribute(Command.loginParameter, existingUser.getUserLogin());
+		request.setAttribute(Command.userTypeParameter, existingUser.getUserType());
 		rd = request.getRequestDispatcher(Command.welcomePageJSP);
 		} catch(ServiceException se) {
 			rd = request.getRequestDispatcher(Command.mainPageJSP);

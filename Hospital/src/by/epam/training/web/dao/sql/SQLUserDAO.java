@@ -26,6 +26,7 @@ public class SQLUserDAO implements UserDAO {
 	public static final String idConst = "id";
 	public static final String loginConst = "login";
 	public static final String passwordConst = "password";
+	public static final String typeConst = "type";
 
     private static Logger logger = LogManager.getLogger(SQLUserDAO.class);
 	
@@ -39,7 +40,7 @@ public class SQLUserDAO implements UserDAO {
 			ResultSet usersSet = getUsersStmt.executeQuery(getAllUsersDBQuery);
 			while (usersSet.next()) {
 				users.add(new User(usersSet.getInt(idConst), usersSet.getString(loginConst),
-						usersSet.getString(passwordConst)));
+						usersSet.getString(passwordConst), usersSet.getString(typeConst)));
 			}
 		} catch (SQLException e) {
 			logger.info(e.getMessage());
@@ -54,16 +55,19 @@ public class SQLUserDAO implements UserDAO {
 	}
 
 	@Override
-	public void signIn(String login, String password) throws DAOException {
-		if (!isExistingUser(login, password)) {
+	public User signIn(String login, String password) throws DAOException {
+		User existingUser = getExistingUser(login, password);
+		if (existingUser == null) {
 			throw new DAOException(UserDAO.userNotFoundMessage);
 		}
+		return existingUser;
 	}
 
 	@Override
 	public void registration(String login, String password) throws DAOException {
 		try {
-			if (isExistingUser(login)) {
+			User existingUser = getExistingUser(login);
+			if (existingUser != null) {
 				throw new DAOException(UserDAO.userAlreadyExistMessage);
 			} else {
 				createUser(login, password);
@@ -93,22 +97,24 @@ public class SQLUserDAO implements UserDAO {
 		}
 	}
 
-	private boolean isExistingUser(String userLogin) {
+	private User getExistingUser(String userLogin) {
+		User existingUser = null;
 		for (int i = 0; i < users.size(); i++) {
 			if (users.get(i).getUserLogin().compareTo(userLogin) == 0) {
-				return true;
+				existingUser = users.get(i);
 			}
 		}
-		return false;
+		return existingUser;
 	}
 
-	private boolean isExistingUser(String userLogin, String userPassword) {
+	private User getExistingUser(String userLogin, String userPassword) {
+		User existingUser = null;
 		for (int i = 0; i < users.size(); i++) {
 			if (users.get(i).getUserLogin().compareTo(userLogin) == 0
 					&& users.get(i).getUserPassword().compareTo(userPassword) == 0) {
-				return true;
+				existingUser = users.get(i);
 			}
 		}
-		return false;
+		return existingUser;
 	}
 }

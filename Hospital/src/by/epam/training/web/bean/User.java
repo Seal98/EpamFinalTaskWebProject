@@ -9,15 +9,26 @@ public class User implements Serializable{
 	private int userId;
 	private String userLogin;
 	private String userPassword;
+	private String userType;
+	
+	private static final String defaultUserType = "patient";
 	
 	public User() {
 		super();
 	}
 	
-	public User(int userId, String userLogin, String userPassword) {
+	public User(int userId, String userLogin, String userPasswor) {
 		this.setUserId(userId);
 		this.setUserLogin(userLogin);
 		this.setUserPassword(userPassword);
+		this.setUserType(defaultUserType);
+	}
+	
+	public User(int userId, String userLogin, String userPassword, String userType) {
+		this.setUserId(userId);
+		this.setUserLogin(userLogin);
+		this.setUserPassword(userPassword);
+		this.setUserType(userType);
 	}
 
 	public int getUserId() {
@@ -42,6 +53,14 @@ public class User implements Serializable{
 
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
+	}
+
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
 	}
 	
 	@Override

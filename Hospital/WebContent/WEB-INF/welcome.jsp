@@ -7,11 +7,15 @@
 <title>Insert title here</title>
 </head>
 <body>
-	WELCOME
 	<form action="createUser" method="post">
 		<input type="submit" onclick="userLogOut();" id="backToMainPageButton" name="backToMainPageButton" value="Back" /><br />
 		<input type="hidden" id="requestParameter" name="requestParameter" value="-1">
 	</form>
+	<%
+		if (request.getAttribute("login") != null && request.getAttribute("userType") != null) {
+			out.println("<h3> Welcome, " + (String) request.getAttribute("userType") + " " + (String) request.getAttribute("login") + "</h3>");
+		}
+	%>
 	<script>
 	function userLogOut(){
 		document.getElementById('requestParameter').value = "LOG_OUT";
