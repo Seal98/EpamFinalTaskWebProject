@@ -1,6 +1,10 @@
 package by.epam.training.web.bean;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable{
+	
+	private static final long serialVersionUID = 8815653912194571673L;
 	
 	private int userId;
 	private String userLogin;
@@ -10,7 +14,7 @@ public class User {
 		super();
 	}
 	
-	public User(int userId, String userLogin, String userPassword){
+	public User(int userId, String userLogin, String userPassword) {
 		this.setUserId(userId);
 		this.setUserLogin(userLogin);
 		this.setUserPassword(userPassword);

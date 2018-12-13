@@ -5,8 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ConnectionPoolDAO {
 	
@@ -14,6 +15,9 @@ public class ConnectionPoolDAO {
 	private String userDB;
 	private String passwordDB;
 	private Deque<Connection> connections = new ArrayDeque<Connection>(20);
+
+    private static Logger logger = LogManager.getLogger(ConnectionPoolDAO.class);
+	public static final String driverName = "com.mysql.jdbc.Driver";
 	
     public ConnectionPoolDAO(String urlDB, String userDB, String passwordDB) {
     	this.urlDB = urlDB;
@@ -24,14 +28,14 @@ public class ConnectionPoolDAO {
     
     private synchronized void createConnections(int connectionsNumber) {
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName(driverName);
 	        for (int i = 0; i < connectionsNumber; i++) {
 	            connections.add(DriverManager.getConnection(urlDB, userDB, passwordDB));
 	        }
 		} catch (ClassNotFoundException e) {
-			System.out.println(e);
+			logger.info(e.getMessage());
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.info(e.getMessage());
 		}
     }
     

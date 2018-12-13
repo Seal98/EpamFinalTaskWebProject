@@ -8,6 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.epam.training.web.bean.User;
 import by.epam.training.web.dao.UserDAO;
 import by.epam.training.web.dao.connector.ConnectionPoolDAO;
@@ -24,28 +27,36 @@ public class SQLUserDAO implements UserDAO {
 	public static final String loginConst = "login";
 	public static final String passwordConst = "password";
 
+    private static Logger logger = LogManager.getLogger(SQLUserDAO.class);
+	
 	public SQLUserDAO() {
 		super();
 		Connection con = null;
+		Statement getUsersStmt = null;
 		try {
 			con = connectionPool.getConnection();
-			Statement logStmt = con.createStatement();
-			ResultSet logRes = logStmt.executeQuery(getAllUsersDBQuery);
-			while (logRes.next()) {
-				users.add(new User(logRes.getInt(idConst), logRes.getString(loginConst),
-						logRes.getString(passwordConst)));
+			getUsersStmt = con.createStatement();
+			ResultSet usersSet = getUsersStmt.executeQuery(getAllUsersDBQuery);
+			while (usersSet.next()) {
+				users.add(new User(usersSet.getInt(idConst), usersSet.getString(loginConst),
+						usersSet.getString(passwordConst)));
 			}
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.info(e.getMessage());
 		} finally {
 			connectionPool.putConnection(con);
+			try {
+				getUsersStmt.close();
+			} catch (SQLException e) {
+				logger.info(e.getMessage());
+			}
 		}
 	}
 
 	@Override
 	public void signIn(String login, String password) throws DAOException {
 		if (!isExistingUser(login, password)) {
-			throw new DAOException("User not found - login or password is wrong");
+			throw new DAOException(UserDAO.userNotFoundMessage);
 		}
 	}
 
@@ -53,28 +64,32 @@ public class SQLUserDAO implements UserDAO {
 	public void registration(String login, String password) throws DAOException {
 		try {
 			if (isExistingUser(login)) {
-				throw new DAOException("User with such login already exists");
+				throw new DAOException(UserDAO.userAlreadyExistMessage);
 			} else {
 				createUser(login, password);
 				users.add(new User(users.size() + 1, login, password));
 			}
 		} catch (DAOException e) {
 			throw e;
+		} catch (SQLException e) {
+			throw new DAOException(e.getMessage());
 		}
 	}
 
-	private void createUser(String login, String password) throws DAOException {
+	private void createUser(String login, String password) throws DAOException, SQLException {
 		Connection connection = null;
+		PreparedStatement insertStmt = null;
 		try {
 			connection = connectionPool.getConnection();
-			PreparedStatement logStmt = connection.prepareStatement(insertUserDBQuery);
-			logStmt.setString(1, login);
-			logStmt.setString(2, password);
-			logStmt.executeUpdate();
+			insertStmt = connection.prepareStatement(insertUserDBQuery);
+			insertStmt.setString(1, login);
+			insertStmt.setString(2, password);
+			insertStmt.executeUpdate();
 		} catch (SQLException e) {
 			throw new DAOException(e.getMessage());
 		} finally {
 			connectionPool.putConnection(connection);
+			insertStmt.close();
 		}
 	}
 

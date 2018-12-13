@@ -7,20 +7,22 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class SignUp implements Command {
 
-	//private static final Logger logger = LogManager.getLogger("emptyFilePath");
+	private static final Logger logger = LogManager.getLogger(SignUp.class);
 	
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) {
-		//logger.error("TEST");
-		RequestDispatcher rd = request.getRequestDispatcher("jsp/signUp.jsp");
+		RequestDispatcher rd = request.getRequestDispatcher(Command.signUpPageJSP);
 		try {
 			rd.forward(request, response);
 		} catch (ServletException e) {
-			System.out.println(e);
+			logger.info(e.getMessage());
 		} catch (IOException e) {
-			System.out.println(e);
+			logger.info(e.getMessage());
 		}
 	}
 }
