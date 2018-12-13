@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -12,11 +13,10 @@
 		<input type="submit" name="signUpButton" onclick="signUp();" value="Sign up" /><br />
 		<input type="hidden" id="requestParameter" name="requestParameter" value="-1">
 	</form>
-	<%
-		if (request.getAttribute("answer") != null) {
-			out.println("<h3>" + (String) request.getAttribute("answer") + "</h3>");
-		}
-	%>
+	<c:set var = "answer" scope = "session" value = "${requestScope.answer}"/>
+	<c:if test = "${answer != null}">
+         <h3><c:out value="${answer}" /></h3>
+    </c:if>
 	<script src="js/script.js"></script>
 </body>
 </html>
