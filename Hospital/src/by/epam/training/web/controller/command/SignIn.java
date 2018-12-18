@@ -20,7 +20,7 @@ public class SignIn implements Command {
     private static Logger logger = LogManager.getLogger(SignIn.class);
     
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) {
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 		ClientService clientService = serviceFactory.getClientService();
 		String login = request.getParameter(Command.loginParameter);
@@ -39,9 +39,9 @@ public class SignIn implements Command {
 		try {
 			rd.forward(request, response);
 		} catch (ServletException e) {
-			logger.info(e);
+			throw e;
 		} catch (IOException e) {
-			logger.info(e.getMessage());
+			throw e;
 		}
 	}
 

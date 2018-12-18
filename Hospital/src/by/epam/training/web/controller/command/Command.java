@@ -1,7 +1,12 @@
 package by.epam.training.web.controller.command;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import by.epam.training.web.exception.ServiceException;
 
 public interface Command {
 	
@@ -16,5 +21,5 @@ public interface Command {
 	public static final String registrationConfirmedMessage = "You have been registered";
 	public static final String wrongCommandMessage = "Wrong command";
 	
-	public void execute(HttpServletRequest request, HttpServletResponse response);
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ServiceException;
 }

@@ -7,42 +7,42 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import by.epam.training.web.exception.ServiceException;
 import by.epam.training.web.service.ClientService;
 import by.epam.training.web.service.ServiceFactory;
 
 public class ConfirmReg implements Command {
 
-    private static Logger logger = LogManager.getLogger(ConfirmReg.class);
-	
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) {
+	public void execute(HttpServletRequest request, HttpServletResponse response)
+			throws ServiceException, ServletException, IOException {
+		RequestDispatcher dispatcher = null;
+		String serviceException = null;
+
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 		ClientService clientService = serviceFactory.getClientService();
+
 		String login = request.getParameter(Command.loginParameter);
 		String password = request.getParameter(Command.passwordParameter);
 		String confirmedPassword = request.getParameter(Command.passwordConfirmParameter);
-		RequestDispatcher rd = null;
-		String serviceException = null;
+
 		try {
-		clientService.signUp(login, password, confirmedPassword);
-		rd = request.getRequestDispatcher(Command.mainPageJSP);
-		request.setAttribute(Command.answerAttribute, Command.registrationConfirmedMessage);
-		} catch(ServiceException se) {
+			clientService.signUp(login, password, confirmedPassword);
+			dispatcher = request.getRequestDispatcher(Command.mainPageJSP);
+			request.setAttribute(Command.answerAttribute, Command.registrationConfirmedMessage);
+		} catch (ServiceException se) {
 			serviceException = se.getMessage();
-			rd = request.getRequestDispatcher(Command.signUpPageJSP);
+			dispatcher = request.getRequestDispatcher(Command.signUpPageJSP);
 			request.setAttribute(Command.answerAttribute, serviceException);
-			logger.info(se.getMessage());
+			throw se;
 		}
+		
 		try {
-			rd.forward(request, response);
+			dispatcher.forward(request, response);
 		} catch (ServletException e) {
-			logger.info(e.getMessage());
+			throw e;
 		} catch (IOException e) {
-			logger.info(e.getMessage());
+			throw e;
 		}
 	}
 

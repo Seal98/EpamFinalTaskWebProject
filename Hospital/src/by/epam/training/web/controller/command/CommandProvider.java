@@ -3,14 +3,9 @@ package by.epam.training.web.controller.command;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class CommandProvider {
 
 	private final Map<CommandName, Command> repository = new HashMap<>();
-
-    private static Logger logger = LogManager.getLogger(CommandProvider.class);
     
 	public CommandProvider() {
 		repository.put(CommandName.SIGN_IN, new SignIn());
@@ -29,7 +24,7 @@ public class CommandProvider {
 			command = repository.get(commandName);
 		} catch (IllegalArgumentException | NullPointerException e) {
 			command = repository.get(CommandName.WRONG_COMMAND);
-			logger.info(e.getMessage());
+			throw e;
 		}
 		return command;
 	}

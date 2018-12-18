@@ -21,7 +21,7 @@ public class ClientService {
 			UserDAO userDao = factoryDao.getUserDAO();
 			existingUser = userDao.signIn(login, password);
 		}catch(DAOException daoE) {
-			throw new ServiceException(daoE.getMessage());
+			throw new ServiceException(daoE.getMessage(), daoE);
 		}
 		return existingUser;
 	}
@@ -36,7 +36,7 @@ public class ClientService {
 		try {
 			userDao.registration(login, password);
 		} catch (DAOException e) {
-			throw new ServiceException(e.getMessage());
+			throw new ServiceException(e.getMessage(), e);
 		}
 	}
 	

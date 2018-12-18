@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +16,7 @@ public class ConnectionPoolDAO {
 	private String urlDB;
 	private String userDB;
 	private String passwordDB;
-	private Deque<Connection> connections = new ArrayDeque<Connection>(20);
+	private BlockingQueue<Connection> connections = new LinkedBlockingQueue<Connection>(20);
 
     private static Logger logger = LogManager.getLogger(ConnectionPoolDAO.class);
 	public static final String driverName = "com.mysql.jdbc.Driver";
@@ -26,27 +28,27 @@ public class ConnectionPoolDAO {
     	createConnections(20);
     }
     
-    private synchronized void createConnections(int connectionsNumber) {
+    private void createConnections(int connectionsNumber) {
 		try {
 			Class.forName(driverName);
 	        for (int i = 0; i < connectionsNumber; i++) {
 	            connections.add(DriverManager.getConnection(urlDB, userDB, passwordDB));
 	        }
 		} catch (ClassNotFoundException e) {
-			logger.info(e.getMessage());
+			logger.error(e.getMessage());
 		} catch (SQLException e) {
-			logger.info(e.getMessage());
+			logger.error(e.getMessage());
 		}
     }
     
-    public synchronized Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException, InterruptedException {
         if(connections.isEmpty()) {
-        	return DriverManager.getConnection(urlDB, userDB, passwordDB);
+        	Thread.sleep(50);
         }
         return connections.poll();
     }
     
-    public synchronized void putConnection(Connection connection) {
+    public void putConnection(Connection connection) {
         connections.add(connection);
     }
 }

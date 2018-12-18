@@ -12,4 +12,8 @@ public class DAOException extends Exception {
 		super(message);
 	}
 	
+	public DAOException(Exception e) {
+		super(e);
+	}
+	
 }

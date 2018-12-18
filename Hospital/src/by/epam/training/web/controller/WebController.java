@@ -7,8 +7,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.epam.training.web.controller.command.Command;
 import by.epam.training.web.controller.command.CommandProvider;
+import by.epam.training.web.exception.ServiceException;
 
 /**
  * Servlet implementation class LoginTest
@@ -17,6 +21,7 @@ public class WebController extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private final CommandProvider provider = new CommandProvider(); 
+    private static Logger logger = LogManager.getLogger(WebController.class);
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -41,6 +46,10 @@ public class WebController extends HttpServlet {
 		Command command;
 		String commandParameter = request.getParameter("requestParameter");
 		command = provider.getCommand(commandParameter);
-		command.execute(request, response);
+		try {
+			command.execute(request, response);
+		} catch (ServiceException e) {
+			logger.error(e);
+		}
 	}
 }

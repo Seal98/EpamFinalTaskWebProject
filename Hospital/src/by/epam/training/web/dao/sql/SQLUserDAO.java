@@ -35,7 +35,11 @@ public class SQLUserDAO implements UserDAO {
 		Connection con = null;
 		Statement getUsersStmt = null;
 		try {
-			con = connectionPool.getConnection();
+			try {
+				con = connectionPool.getConnection();
+			} catch (InterruptedException e) {
+				logger.error(e);
+			}
 			getUsersStmt = con.createStatement();
 			ResultSet usersSet = getUsersStmt.executeQuery(getAllUsersDBQuery);
 			while (usersSet.next()) {
@@ -43,13 +47,13 @@ public class SQLUserDAO implements UserDAO {
 						usersSet.getString(passwordConst), usersSet.getString(typeConst)));
 			}
 		} catch (SQLException e) {
-			logger.info(e.getMessage());
+			logger.error(e);
 		} finally {
 			connectionPool.putConnection(con);
 			try {
 				getUsersStmt.close();
 			} catch (SQLException e) {
-				logger.info(e.getMessage());
+				logger.error(e);
 			}
 		}
 	}
@@ -76,7 +80,7 @@ public class SQLUserDAO implements UserDAO {
 		} catch (DAOException e) {
 			throw e;
 		} catch (SQLException e) {
-			throw new DAOException(e.getMessage());
+			throw new DAOException(e);
 		}
 	}
 
@@ -84,13 +88,17 @@ public class SQLUserDAO implements UserDAO {
 		Connection connection = null;
 		PreparedStatement insertStmt = null;
 		try {
-			connection = connectionPool.getConnection();
+			try {
+				connection = connectionPool.getConnection();
+			} catch (InterruptedException e) {
+				logger.error(e);
+			}
 			insertStmt = connection.prepareStatement(insertUserDBQuery);
 			insertStmt.setString(1, login);
 			insertStmt.setString(2, password);
 			insertStmt.executeUpdate();
 		} catch (SQLException e) {
-			throw new DAOException(e.getMessage());
+			throw new DAOException(e);
 		} finally {
 			connectionPool.putConnection(connection);
 			insertStmt.close();
