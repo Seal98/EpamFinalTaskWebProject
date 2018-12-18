@@ -29,7 +29,6 @@ public class SignIn implements Command {
 		try {
 		User existingUser = clientService.signIn(login, password);
 		request.setAttribute(Command.loginParameter, existingUser.getUserLogin());
-		request.setAttribute(Command.userTypeParameter, existingUser.getUserType());
 		rd = request.getRequestDispatcher(Command.welcomePageJSP);
 		} catch(ServiceException se) {
 			rd = request.getRequestDispatcher(Command.mainPageJSP);

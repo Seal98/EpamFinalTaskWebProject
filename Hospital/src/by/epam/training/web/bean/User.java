@@ -1,34 +1,31 @@
 package by.epam.training.web.bean;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class User implements Serializable{
-	
+public class User implements Serializable {
+
 	private static final long serialVersionUID = 8815653912194571673L;
-	
+	public static final String sampleHashcodeString = "sampleString";
+
 	private int userId;
 	private String userLogin;
 	private String userPassword;
-	private String userType;
-	
-	private static final String defaultUserType = "patient";
-	
+	private String firstName;
+	private String lastName;
+	private Date birthDate;
+
 	public User() {
 		super();
 	}
-	
-	public User(int userId, String userLogin, String userPassword) {
+
+	public User(int userId, String userLogin, String userPassword, String firstName, String lastName, Date birthDate) {
 		this.setUserId(userId);
 		this.setUserLogin(userLogin);
 		this.setUserPassword(userPassword);
-		this.setUserType(defaultUserType);
-	}
-	
-	public User(int userId, String userLogin, String userPassword, String userType) {
-		this.setUserId(userId);
-		this.setUserLogin(userLogin);
-		this.setUserPassword(userPassword);
-		this.setUserType(userType);
+		this.setFirstName(firstName);
+		this.setLastName(lastName);
+		this.setBirthDate(new Date(birthDate.getTime()));
 	}
 
 	public int getUserId() {
@@ -55,26 +52,42 @@ public class User implements Serializable{
 		this.userPassword = userPassword;
 	}
 
-	public String getUserType() {
-		return userType;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setUserType(String userType) {
-		this.userType = userType;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
-	
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public Date getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
+
 	@Override
 	public boolean equals(Object o) {
-		if(o == null) {
+		if (o == null) {
 			return false;
 		}
-		if(this == o) {
+		if (this == o) {
 			return true;
 		}
-		if(this.getClass().getName().compareTo(o.getClass().getName()) != 0) {
+		if (this.getClass().getName().compareTo(o.getClass().getName()) != 0) {
 			return false;
 		}
-		if(this.hashCode() != o.hashCode()) {
+		if (this.hashCode() != o.hashCode()) {
 			return false;
 		}
 		return true;
@@ -82,8 +95,15 @@ public class User implements Serializable{
 	
 	@Override
 	public int hashCode() {
-		int result = userId*5 + userLogin.compareTo("sampleString")*4 + userPassword.compareTo("sampleString")*4;
+		int result = userId * 5 + userLogin.compareTo(sampleHashcodeString) * 4
+				+ userPassword.compareTo(sampleHashcodeString) * 4 + firstName.compareTo(sampleHashcodeString) * 7
+				+ lastName.compareTo(sampleHashcodeString) * 3 + (int) birthDate.getTime() / 500000;
 		return result;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "ID: " + userId + ",  " + "LOGIN: " + userLogin + ",  PASSWORD: " + userPassword + ",  NAME: "
+				+ firstName + ",  SURNAME: " + lastName + ",  BIRTH_DATE: " + birthDate;
+	}
 }

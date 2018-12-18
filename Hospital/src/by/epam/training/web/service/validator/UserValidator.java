@@ -5,6 +5,12 @@ public class UserValidator {
 	public static final int LOGIN_MIN_LENGTH = 4;
 	public static final int LOGIN_MAX_LENGTH = 15;
 
+	public static final int FIRST_NAME_MIN_LENGTH = 1;
+	public static final int FIRST_NAME_MAX_LENGTH = 30;
+
+	public static final int LAST_NAME_MIN_LENGTH = 1;
+	public static final int LAST_NAME_MAX_LENGTH = 30;
+
 	public static final int PASSWORD_MIN_LENGTH = 5;
 	public static final int PASSWORD_MAX_LENGTH = 15;
 
@@ -17,14 +23,48 @@ public class UserValidator {
 		return result;
 	}
 
-	public ValidatorResult userSignUpDataValidator(String userLogin, String userPassword,
-			String userConfirmedPassword) {
-		ValidatorResult result = userLoginValidator(userLogin);
+	public ValidatorResult userSignUpDataValidator(String userLogin, String userPassword, String userConfirmedPassword,
+			String userFirstName, String userLastName) {
+		ValidatorResult result = userFirstNameValidator(userFirstName);
+		if (!result.isValid()) {
+			return result;
+		}
+		result = userLastNameValidator(userLastName);
+		if (!result.isValid()) {
+			return result;
+		}
+		result = userLoginValidator(userLogin);
 		if (!result.isValid()) {
 			return result;
 		}
 		result = userPasswordValidator(userPassword, userConfirmedPassword);
 		return result;
+	}
+
+	private ValidatorResult userFirstNameValidator(String userFirstName) {
+		if (userFirstName == null || userFirstName.isEmpty()) {
+			return new ValidatorResult(false, ValidatorMessage.firstNameEmptyMessage);
+		}
+		if (userFirstName.length() < FIRST_NAME_MIN_LENGTH) {
+			return new ValidatorResult(false, ValidatorMessage.firstNameTooShortMessage);
+		}
+		if (userFirstName.length() > FIRST_NAME_MAX_LENGTH) {
+			return new ValidatorResult(false, ValidatorMessage.firstNameTooLongMessage);
+		}
+		return new ValidatorResult(true, ValidatorMessage.firstNameSatisfactoryMessage);
+	}
+
+	private ValidatorResult userLastNameValidator(String userLastName) {
+		if (userLastName == null || userLastName.isEmpty()) {
+			return new ValidatorResult(false, ValidatorMessage.lastNameEmptyMessage);
+		}
+		if (userLastName.length() < LAST_NAME_MIN_LENGTH) {
+			return new ValidatorResult(false, ValidatorMessage.lastNameTooShortMessage);
+		}
+		if (userLastName.length() > LAST_NAME_MAX_LENGTH) {
+			return new ValidatorResult(false, ValidatorMessage.lastNameTooLongMessage);
+		}
+		return new ValidatorResult(true, ValidatorMessage.lastNameSatisfactoryMessage);
 	}
 
 	private ValidatorResult userLoginValidator(String userLogin) {
