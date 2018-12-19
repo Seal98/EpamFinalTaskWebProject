@@ -16,6 +16,9 @@ import by.epam.training.web.bean.Doctor;
 import by.epam.training.web.bean.Nurse;
 import by.epam.training.web.bean.Patient;
 import by.epam.training.web.bean.User;
+import by.epam.training.web.bean.factory.NurseFactory;
+import by.epam.training.web.bean.factory.PatientFactory;
+import by.epam.training.web.bean.factory.UserFactory;
 import by.epam.training.web.dao.UserDAO;
 import by.epam.training.web.dao.connector.ConnectionPoolDAO;
 import by.epam.training.web.exception.DAOException;
@@ -45,6 +48,8 @@ public class SQLUserDAO implements UserDAO {
 	public static final String loginDataIdFKConst = "login_data_id";
 	public static final String admissionDateConst = "admission_date";
 	public static final String attendedDoctorIdConst = "attended_doctor_id";
+
+	private UserFactory factory = null;
 
 	private static Logger logger = LogManager.getLogger(SQLUserDAO.class);
 
@@ -90,11 +95,8 @@ public class SQLUserDAO implements UserDAO {
 			}
 			activeStmt = connection.createStatement();
 			loadDoctors(activeStmt, connection);
-			System.out.println("Size: " + users.size());
 			loadNurses(activeStmt, connection);
-			System.out.println("Size: " + users.size());
 			loadPatients(activeStmt, connection);
-			System.out.println("Size: " + users.size());
 		} catch (SQLException e) {
 			logger.error(e);
 		} catch (DAOException e) {
@@ -122,23 +124,19 @@ public class SQLUserDAO implements UserDAO {
 
 	private void loadNurses(Statement activeStmt, Connection con) throws SQLException, DAOException {
 		ResultSet usersSet = activeStmt.executeQuery(getAllNursesDBQuery);
+		factory = NurseFactory.getInstance();
 		while (usersSet.next()) {
 			ResultSet loginSet = getLoginDataFromUsers(activeStmt, con, usersSet.getInt(loginDataIdFKConst));
-			users.add(new Nurse(usersSet.getInt(loginDataIdFKConst), loginSet.getString(loginConst),
-					loginSet.getString(passwordConst), usersSet.getString(firstNameConst),
-					usersSet.getString(lastNameConst), usersSet.getDate(birthdateConst),
-					usersSet.getString(experienceConst)));
+			users.add(factory.createUser(usersSet, loginSet));
 		}
 	}
 
 	private void loadPatients(Statement activeStmt, Connection con) throws SQLException, DAOException {
 		ResultSet usersSet = activeStmt.executeQuery(getAllPatientsDBQuery);
+		factory = PatientFactory.getInstance();
 		while (usersSet.next()) {
 			ResultSet loginSet = getLoginDataFromUsers(activeStmt, con, usersSet.getInt(loginDataIdFKConst));
-			users.add(new Patient(usersSet.getInt(loginDataIdFKConst), loginSet.getString(loginConst),
-					loginSet.getString(passwordConst), usersSet.getString(firstNameConst),
-					usersSet.getString(lastNameConst), usersSet.getDate(birthdateConst),
-					usersSet.getDate(admissionDateConst), usersSet.getInt(attendedDoctorIdConst)));
+			users.add(factory.createUser(usersSet, loginSet));
 		}
 	}
 
@@ -173,9 +171,6 @@ public class SQLUserDAO implements UserDAO {
 			ResultSet result = insertUserStmt.getGeneratedKeys();
 			result.next();
 			int lastId = result.getInt(1);
-			//////////////////////////////
-			System.out.println("LAST ID: " + lastId);
-			//////////////////////////////
 			insertPatientStmt.setString(1, firstName);
 			insertPatientStmt.setString(2, lastName);
 			insertPatientStmt.setDate(3, birthdate);
@@ -206,9 +201,7 @@ public class SQLUserDAO implements UserDAO {
 
 	private User getExistingUser(String userLogin, String userPassword) {
 		User existingUser = null;
-		System.out.println(users.size());
 		for (int i = 0; i < users.size(); i++) {
-			System.out.println(users.get(i));
 			if (users.get(i).getUserLogin().compareTo(userLogin) == 0
 					&& users.get(i).getUserPassword().compareTo(userPassword) == 0) {
 				existingUser = users.get(i);

@@ -9,7 +9,10 @@
 </head>
 <body>
 	<form action="createUser" method="post">
-		<input type="hidden" name="command" value="forward" /> Enter login:<br />
+		<input type="hidden" name="command" value="forward" /> First name: <br />
+		<input type="text" name="fname" value="" /><br /> Last name: <br />
+		<input type="text" name="lname" value="" /><br /> Birthdate: <br />
+		<input type="date" name="bdate" value="" /><br /> Enter login:<br />
 		<input type="text" name="login" value="" /><br /> Enter password:<br />
 		<input type="password" name="password" value="" /><br /> Confirm password:<br />
 		<input type="password" name="passwordConfirm" value="" /><br /> 
