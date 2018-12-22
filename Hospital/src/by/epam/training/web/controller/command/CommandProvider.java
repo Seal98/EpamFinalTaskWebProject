@@ -13,6 +13,8 @@ public class CommandProvider {
 		repository.put(CommandName.BACK_TO_WELCOME_PAGE, new BackToWelcomePage());
 		repository.put(CommandName.CONFIRM_REG, new ConfirmReg());
 		repository.put(CommandName.LOG_OUT, new LogOut());
+		repository.put(CommandName.RU, new ChangeLocale());
+		repository.put(CommandName.EN, new ChangeLocale());
 		repository.put(CommandName.WRONG_COMMAND, new WrongCommand());
 	}
 
@@ -24,7 +26,6 @@ public class CommandProvider {
 			command = repository.get(commandName);
 		} catch (IllegalArgumentException | NullPointerException e) {
 			command = repository.get(CommandName.WRONG_COMMAND);
-			throw e;
 		}
 		return command;
 	}

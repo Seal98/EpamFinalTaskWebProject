@@ -1,9 +1,6 @@
 package by.epam.training.web.controller.command;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,7 +17,6 @@ public class ConfirmReg implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServiceException, ServletException, IOException {
 		RequestDispatcher dispatcher = null;
-		String serviceException = null;
 
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 		ClientService clientService = serviceFactory.getClientService();

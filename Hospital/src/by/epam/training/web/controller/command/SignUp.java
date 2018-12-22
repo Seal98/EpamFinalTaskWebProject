@@ -13,6 +13,7 @@ public class SignUp implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		RequestDispatcher rd = request.getRequestDispatcher(Command.signUpPageJSP);
 		try {
+			request.getSession(true).setAttribute("local", request.getAttribute("local"));
 			rd.forward(request, response);
 		} catch (ServletException e) {
 			throw e;

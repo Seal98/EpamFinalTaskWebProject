@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import by.epam.training.web.bean.Doctor;
-import by.epam.training.web.bean.Nurse;
 import by.epam.training.web.bean.User;
 import by.epam.training.web.dao.sql.SQLUserDAO;
 

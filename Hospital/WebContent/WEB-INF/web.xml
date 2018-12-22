@@ -13,6 +13,10 @@
 		<welcome-file>default.jsp</welcome-file>
 	</welcome-file-list>
 	<servlet>
+		<servlet-name>ChangeLocale</servlet-name>
+		<servlet-class>by.epam.training.web.controller.WebController</servlet-class>
+	</servlet>
+	<servlet>
 		<servlet-name>WebAppServlet</servlet-name>
 		<servlet-class>by.epam.training.web.controller.WebController</servlet-class>
 	</servlet>
@@ -39,5 +43,9 @@
 	<servlet-mapping>
 		<servlet-name>WelcomePage</servlet-name>
 		<url-pattern>/welcome</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ChangeLocale</servlet-name>
+		<url-pattern>/setLocale</url-pattern>
 	</servlet-mapping>
 </web-app>

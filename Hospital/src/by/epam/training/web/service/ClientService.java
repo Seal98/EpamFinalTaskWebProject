@@ -21,6 +21,7 @@ public class ClientService {
 			throw new ServiceException(result.getValidationMessage());
 		}
 		try {
+			System.out.println("Here");
 			FactoryDAO factoryDao = FactoryDAO.getInstance();
 			UserDAO userDao = factoryDao.getUserDAO();
 			existingUser = userDao.signIn(login, password);
