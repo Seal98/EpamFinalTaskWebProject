@@ -14,10 +14,15 @@ public class ChangeLocale implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ServiceException {
-		System.out.println("Locale: " + request.getParameter("requestParameter"));
-		RequestDispatcher dispatcher = null;
 		request.getSession(true).setAttribute("locale", request.getParameter("requestParameter"));
-		dispatcher = request.getRequestDispatcher(Command.mainPageJSP);
-		dispatcher.forward(request, response);
+		RequestDispatcher rd = null;
+		String uri = request.getRequestURI().split("/EpamWebProject/")[1];
+		switch(uri) {
+		case "authorization": rd = request.getRequestDispatcher(""); break;
+		case "createUser": rd = request.getRequestDispatcher("WEB-INF/signUp.jsp"); break;
+		default: rd = request.getRequestDispatcher(""); break;
+		}
+		
+		rd.forward(request, response);
 	}
 }

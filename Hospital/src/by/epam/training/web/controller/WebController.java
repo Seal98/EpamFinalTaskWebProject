@@ -45,6 +45,7 @@ public class WebController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Command command;
 		String commandParameter = request.getParameter("requestParameter");
+		System.out.println(commandParameter);
 		command = provider.getCommand(commandParameter);
 		try {
 			command.execute(request, response);
