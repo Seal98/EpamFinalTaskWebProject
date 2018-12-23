@@ -17,6 +17,7 @@ public class ConfirmReg implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServiceException, ServletException, IOException {
 		RequestDispatcher dispatcher = null;
+		request.getSession(true).setAttribute(Command.answerAttribute, null);
 
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 		ClientService clientService = serviceFactory.getClientService();
@@ -30,22 +31,16 @@ public class ConfirmReg implements Command {
 		try {
 			String birthdate = request.getParameter(Command.birthDateParameter);
 			clientService.signUp(login, password, confirmedPassword, firstName, lastName, birthdate);
-			dispatcher = request.getRequestDispatcher(Command.mainPageJSP);
-			request.setAttribute(Command.answerAttribute, Command.registrationConfirmedMessage);
+			//dispatcher = request.getRequestDispatcher(Command.mainPageJSP);
+			request.getSession(true).setAttribute(Command.answerAttribute, Command.registrationConfirmedMessage);
+			response.sendRedirect(Command.mainPageJSP);
 		} catch (ServiceException se) {
 			dispatcher = request.getRequestDispatcher(Command.signUpPageJSP);
-			request.setAttribute(Command.answerAttribute, se.getMessage());
+			request.getSession(true).setAttribute(Command.answerAttribute, se.getMessage());
 			dispatcher.forward(request, response);
 			throw se;
 		}
 		
-		try {
-			dispatcher.forward(request, response);
-		} catch (ServletException e) {
-			throw e;
-		} catch (IOException e) {
-			throw e;
-		}
 	}
 
 }

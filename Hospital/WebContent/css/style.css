@@ -1,0 +1,54 @@
+.auth-form{
+background-color: rgb(143, 232, 202);
+border-radius: 10px;
+width: 20%;
+border: 2px solid rgb(103, 204, 6);
+font-size: 1.3vw;
+padding-left: 2.5%;
+padding-top: 0.5%;
+position: fixed;
+top: 40%;
+left: 50%;
+transform: translate(-50%, -50%);
+}
+
+.auth-buttons{
+margin-top: 3.5%;
+margin-left: 9.5%;
+padding: 5px;
+background-color: rgb(55, 189, 128);
+border-radius: 0.6vw;
+font-size: 1.0vw;
+outline: none;
+}
+
+.reg-form{
+background-color: rgb(143, 232, 202);
+border-radius: 10px;
+width: 20%;
+border: 2px solid rgb(103, 204, 6);
+font-size: 1.3vw;
+padding-left: 2.5%;
+padding-top: 0.5%;
+position: fixed;
+top: 40%;
+left: 50%;
+transform: translate(-50%, -50%);
+}
+
+.reg-buttons{
+margin-top: 3.5%;
+margin-left: 9.5%;
+padding: 5px;
+background-color: rgb(55, 189, 128);
+border-radius: 0.6vw;
+font-size: 1.0vw;
+outline: none;
+}
+
+.locale-buttons{
+background-color: rgb(55, 189, 128);
+border-radius: 0.6vw;
+font-size: 1.0vw;
+outline: none;	
+}

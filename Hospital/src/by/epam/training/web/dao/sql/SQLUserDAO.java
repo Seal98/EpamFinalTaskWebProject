@@ -89,13 +89,9 @@ public class SQLUserDAO implements UserDAO {
 		try {
 			connection = connectionPool.getConnection();
 			activeStmt = connection.createStatement();
-			System.out.println("SIZE: " + users.size());
 			loadDoctors(activeStmt, connection);
-			System.out.println("SIZE: " + users.size());
 			loadNurses(activeStmt, connection);
-			System.out.println("SIZE: " + users.size());
 			loadPatients(activeStmt, connection);
-			System.out.println("SIZE: " + users.size());
 		} catch (SQLException e) {
 			logger.error(e);
 		} catch (DAOException e) {
@@ -113,16 +109,12 @@ public class SQLUserDAO implements UserDAO {
 	}
 
 	private void loadDoctors(Statement activeStmt, Connection con) throws SQLException, DAOException {
-		System.out.println("Doc start");
 		ResultSet usersSet = activeStmt.executeQuery(getAllDoctorsDBQuery);
-		System.out.println("Doc in collection");
 		factory = DoctorFactory.getInstance();
 		while (usersSet.next()) {
 			ResultSet loginSet = getLoginDataFromUsers(activeStmt, con, usersSet.getInt(loginDataIdFKConst));
-			System.out.println("User back");
 			users.add(factory.createUser(usersSet, loginSet));
 		}
-		System.out.println("Doc end");
 	}
 
 	private void loadNurses(Statement activeStmt, Connection con) throws SQLException, DAOException {
@@ -149,7 +141,6 @@ public class SQLUserDAO implements UserDAO {
 		insertStmt.setInt(1, loginFKId);
 		ResultSet result = insertStmt.executeQuery();
 		if (result.next()) {
-			System.out.println("User found");
 			return result;
 		}
 		throw new DAOException("User wasn't found among users");
@@ -205,9 +196,7 @@ public class SQLUserDAO implements UserDAO {
 
 	private User getExistingUser(String userLogin, String userPassword) {
 		User existingUser = null;
-		System.out.println("Here " + users.size());
 		for (int i = 0; i < users.size(); i++) {
-			System.out.println(users.get(i));
 			if (users.get(i).getUserLogin().compareTo(userLogin) == 0
 					&& users.get(i).getUserPassword().compareTo(userPassword) == 0) {
 				existingUser = users.get(i);

@@ -21,6 +21,7 @@ public class SignIn implements Command {
     
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		request.getSession(true).setAttribute(Command.answerAttribute, null);
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 		ClientService clientService = serviceFactory.getClientService();
 		String login = request.getParameter(Command.loginParameter);
@@ -30,17 +31,11 @@ public class SignIn implements Command {
 		User existingUser = clientService.signIn(login, password);
 		request.setAttribute(Command.loginParameter, existingUser.getUserLogin());
 		rd = request.getRequestDispatcher(Command.welcomePageJSP);
+		rd.forward(request, response);
 		} catch(ServiceException se) {
-			rd = request.getRequestDispatcher(Command.mainPageJSP);
-			request.setAttribute(Command.answerAttribute, se.getMessage());
+			request.getSession(true).setAttribute(Command.answerAttribute, se.getMessage());
 			logger.info(se.getMessage());
-		}
-		try {
-			rd.forward(request, response);
-		} catch (ServletException e) {
-			throw e;
-		} catch (IOException e) {
-			throw e;
+			response.sendRedirect(Command.mainPageJSP);
 		}
 	}
 
