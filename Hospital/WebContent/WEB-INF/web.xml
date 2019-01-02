@@ -28,6 +28,10 @@
 		<servlet-name>WelcomePage</servlet-name>
 		<jsp-file>/WEB-INF/welcome.jsp</jsp-file>
 	</servlet>
+	<servlet>
+		<servlet-name>PatientPage</servlet-name>
+		<jsp-file>/WEB-INF/patientPage.jsp</jsp-file>
+	</servlet>	
 	<servlet-mapping>
 		<servlet-name>WebAppServlet</servlet-name>
 		<url-pattern>/authorization</url-pattern>
@@ -43,6 +47,10 @@
 	<servlet-mapping>
 		<servlet-name>WelcomePage</servlet-name>
 		<url-pattern>/welcome</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>PatientPage</servlet-name>
+		<url-pattern>/patientPage</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ChangeLocale</servlet-name>

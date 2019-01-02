@@ -2,6 +2,7 @@ package by.epam.training.web.dao;
 
 import java.sql.Date;
 
+import by.epam.training.web.bean.PatientCuringInfo;
 import by.epam.training.web.bean.User;
 import by.epam.training.web.exception.DAOException;
 
@@ -15,4 +16,6 @@ public interface UserDAO {
 	public void registration(String login, String password, String firstName, String lastName, Date birthdate,
 			Date admissionDate) throws DAOException;
 
+	public PatientCuringInfo getUserInfo(int userId) throws DAOException;
+	
 }

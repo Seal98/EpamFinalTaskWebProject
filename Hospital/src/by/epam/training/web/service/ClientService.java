@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import by.epam.training.web.bean.PatientCuringInfo;
 import by.epam.training.web.bean.User;
 import by.epam.training.web.dao.FactoryDAO;
 import by.epam.training.web.dao.UserDAO;
@@ -21,7 +22,6 @@ public class ClientService {
 			throw new ServiceException(result.getValidationMessage());
 		}
 		try {
-			System.out.println("Here");
 			FactoryDAO factoryDao = FactoryDAO.getInstance();
 			UserDAO userDao = factoryDao.getUserDAO();
 			existingUser = userDao.signIn(login, password);
@@ -51,4 +51,16 @@ public class ClientService {
 		}
 	}
 
+	public PatientCuringInfo getUserInfo(int userId) throws ServiceException {
+		FactoryDAO factoryDao = FactoryDAO.getInstance();
+		UserDAO userDao = factoryDao.getUserDAO();
+		PatientCuringInfo curingInfo = null;
+		try {
+			curingInfo = userDao.getUserInfo(userId);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return curingInfo;
+	}
+	
 }

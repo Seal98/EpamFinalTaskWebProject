@@ -15,7 +15,7 @@
 			value="-1">
 	</form>
 	<div>
-		Welcome, <c:out value="${requestScope.userType}"/> <c:out value="${requestScope.login}"/>
+		Welcome, <c:out value="${sessionScope.userType}"/> <c:out value="${sessionScope.login}"/>
 	</div>
 	<script>
 		function userLogOut() {

@@ -6,13 +6,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.sql.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import by.epam.training.web.bean.Appointment;
+import by.epam.training.web.bean.Doctor;
+import by.epam.training.web.bean.Medicine;
 import by.epam.training.web.bean.Patient;
+import by.epam.training.web.bean.PatientCuringInfo;
+import by.epam.training.web.bean.Procedure;
+import by.epam.training.web.bean.Surgery;
 import by.epam.training.web.bean.User;
 import by.epam.training.web.bean.factory.DoctorFactory;
 import by.epam.training.web.bean.factory.NurseFactory;
@@ -33,6 +40,9 @@ public class SQLUserDAO implements UserDAO {
 	public static final String getAllNursesDBQuery = "SELECT * from nurses";
 
 	public static final String insertUserDBQuery = "INSERT into users(login, password) values(?, ?)";
+	public static final String getAttendedDoctor = "select * from doctors where id = (select attended_doctor_id from patients where login_data_id=?)";
+	public static final String getPatientAppointmentsNursesExecutors = "select a.id, a.appointed_doctor_id, a.procedure, a.medicine, a.surgery, n.nurse_id from appointments a inner join nurses_executors n on n.appointment_id = a.id where patient_id = (select id from patients where login_data_id=?)";
+	public static final String getPatientAppointmentsDoctorsExecutors = "select a.id, a.appointed_doctor_id, a.procedure, a.medicine, a.surgery, n.doctor_id from appointments a inner join doctors_executors n on n.appointment_id = a.id where patient_id = (select id from patients where login_data_id=?);";
 	public static final String insertPatientDBQuery = "INSERT into patients(first_name, last_name, birthdate, admission_date, attended_doctor_id, login_data_id) values(?, ?, ?, ?, ?, ?)";
 	public static final String selectUserByIdDBQuery = "select * from users  where id = ?";
 	public static final String idConst = "id";
@@ -81,6 +91,195 @@ public class SQLUserDAO implements UserDAO {
 		} catch (SQLException e) {
 			throw new DAOException(e);
 		}
+	}
+
+	@Override
+	public PatientCuringInfo getUserInfo(int userId) throws DAOException {
+		PatientCuringInfo curingInfo = null;
+		Connection connection = null;
+		PreparedStatement activeStmt = null;
+		try {
+			connection = connectionPool.getConnection();
+			activeStmt = connection.prepareStatement(getAttendedDoctor);
+			activeStmt.setInt(1, userId);
+			ResultSet usersSet = activeStmt.executeQuery();
+			usersSet.next();
+			int doctorId = usersSet.getInt("login_data_id");
+			Doctor attendedDoctor = null;
+			for (User user : users) {
+				if (user.getUserId() == doctorId) {
+					attendedDoctor = (Doctor) user;
+					break;
+				}
+			}
+			curingInfo = new PatientCuringInfo();
+			curingInfo.setAttendedDoctor(attendedDoctor);
+			/*
+			 * 
+			 * FOR APPOINTMENTS
+			 * 
+			 */
+			activeStmt.close();
+			List<Appointment> patientAppointments = new LinkedList<>();
+			activeStmt = connection.prepareStatement(getPatientAppointmentsNursesExecutors);
+			activeStmt.setInt(1, userId);
+			ResultSet appointmentsSet = activeStmt.executeQuery();
+			while (appointmentsSet.next()) {
+				PreparedStatement appointeeStmt = connection
+						.prepareStatement("select login_data_id from doctors where id = "
+								+ appointmentsSet.getInt("appointed_doctor_id"));
+				PreparedStatement executorsStmt = connection.prepareStatement(
+						"select login_data_id from nurses where id = " + appointmentsSet.getInt("nurse_id"));
+				ResultSet appointee = appointeeStmt.executeQuery();
+				ResultSet nurseExecutor = executorsStmt.executeQuery();
+				nurseExecutor.next();
+				appointee.next();
+				Appointment appointment = new Appointment();
+				appointment.setProcedure(appointmentsSet.getBoolean("procedure"));
+				appointment.setMedicine(appointmentsSet.getBoolean("medicine"));
+
+				if (appointment.getProcedure()) {
+					appointment.setTreatment(getProcedureForCuringInfo(appointmentsSet.getInt("id"), connection));
+				} else {
+					appointment.setTreatment(getMedicineForCuringInfo(appointmentsSet.getInt("id"), connection));
+				}
+				int appointeeId = appointee.getInt("login_data_id");
+				int executorId = nurseExecutor.getInt("login_data_id");
+				for (User user : users) {
+					if (user.getUserId() == appointeeId) {
+						appointment.setAppointee((Doctor) user);
+						break;
+					}
+				}
+				for (User user : users) {
+					if (user.getUserId() == executorId) {
+						appointment.setAppointmentExecutor(user);
+						break;
+					}
+				}
+				patientAppointments.add(appointment);
+				appointeeStmt.close();
+				nurseExecutor.close();
+			}
+			activeStmt.close();
+
+			activeStmt = connection.prepareStatement(getPatientAppointmentsDoctorsExecutors);
+			activeStmt.setInt(1, userId);
+			appointmentsSet = activeStmt.executeQuery();
+			while (appointmentsSet.next()) {
+				PreparedStatement appointeeStmt = connection
+						.prepareStatement("select login_data_id from doctors where id = "
+								+ appointmentsSet.getInt("appointed_doctor_id"));
+				PreparedStatement executorsStmt = connection.prepareStatement(
+						"select login_data_id from doctors where id = " + appointmentsSet.getInt("doctor_id"));
+				ResultSet appointee = appointeeStmt.executeQuery();
+				ResultSet doctorExecutor = executorsStmt.executeQuery();
+				doctorExecutor.next();
+				appointee.next();
+				Appointment appointment = new Appointment();
+				appointment.setProcedure(appointmentsSet.getBoolean("procedure"));
+				appointment.setMedicine(appointmentsSet.getBoolean("medicine"));
+				appointment.setSurgery(appointmentsSet.getBoolean("surgery"));
+				if (appointment.getProcedure()) {
+					appointment.setTreatment(getProcedureForCuringInfo(appointmentsSet.getInt("id"), connection));
+				} else if (appointment.getSurgery()) {
+					appointment.setTreatment(getSurgeryForCuringInfo(appointmentsSet.getInt("id"), connection));
+				} else {
+					appointment.setTreatment(getMedicineForCuringInfo(appointmentsSet.getInt("id"), connection));
+				}
+				int appointeeId = appointee.getInt("login_data_id");
+				int executorId = doctorExecutor.getInt("login_data_id");
+				for (User user : users) {
+					if (user.getUserId() == appointeeId) {
+						appointment.setAppointee((Doctor) user);
+						break;
+					}
+				}
+				for (User user : users) {
+					if (user.getUserId() == executorId) {
+						appointment.setAppointmentExecutor(user);
+						break;
+					}
+				}
+				patientAppointments.add(appointment);
+				appointeeStmt.close();
+				doctorExecutor.close();
+			}
+			activeStmt.close();
+			curingInfo.setAppointments(patientAppointments);
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} catch (InterruptedException e) {
+			throw new DAOException(e);
+		} finally {
+			connectionPool.putConnection(connection);
+			try {
+				activeStmt.close();
+			} catch (SQLException e) {
+				logger.error(e);
+			}
+		}
+		return curingInfo;
+	}
+
+	private Medicine getMedicineForCuringInfo(int appointmentId, Connection connection)
+			throws DAOException, SQLException {
+		PreparedStatement treatmentStmt = null;
+		Medicine medicine = new Medicine();
+		try {
+			treatmentStmt = connection.prepareStatement(
+					"select * from medicine where id = (select medicine_id from appointed_medicine where appointment_id="
+							+ appointmentId + ")");
+			ResultSet treatmentSet = treatmentStmt.executeQuery();
+			treatmentSet.next();
+			medicine.setName(treatmentSet.getString("name"));
+			medicine.setIndications(treatmentSet.getString("indications"));
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} finally {
+			treatmentStmt.close();
+		}
+		return medicine;
+	}
+
+	private Procedure getProcedureForCuringInfo(int appointmentId, Connection connection)
+			throws SQLException, DAOException {
+		Procedure procedure = new Procedure();
+		PreparedStatement treatmentStmt = null;
+		try {
+			treatmentStmt = connection.prepareStatement(
+					"select * from procedures where id = (select procedure_id from appointed_procedures where appointment_id="
+							+ appointmentId + ")");
+			ResultSet treatmentSet = treatmentStmt.executeQuery();
+			treatmentSet.next();
+			procedure.setName(treatmentSet.getString("name"));
+			procedure.setDescription(treatmentSet.getString("description"));
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} finally {
+			treatmentStmt.close();
+		}
+		return procedure;
+	}
+
+	private Surgery getSurgeryForCuringInfo(int appointmentId, Connection connection)
+			throws DAOException, SQLException {
+		PreparedStatement treatmentStmt = null;
+		Surgery surgery = new Surgery();
+		try {
+			treatmentStmt = connection.prepareStatement(
+					"select * from surgeries where id = (select surgery_id from appointed_surgeries where appointment_id="
+							+ appointmentId + ")");
+			ResultSet treatmentSet = treatmentStmt.executeQuery();
+			treatmentSet.next();
+			surgery.setName(treatmentSet.getString("name"));
+			surgery.setDuration(treatmentSet.getString("duration"));
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} finally {
+			treatmentStmt.close();
+		}
+		return surgery;
 	}
 
 	private void loadUsers() {
