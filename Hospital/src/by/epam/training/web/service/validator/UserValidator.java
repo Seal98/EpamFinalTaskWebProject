@@ -41,6 +41,19 @@ public class UserValidator {
 		return result;
 	}
 
+	public ValidatorResult validateDischargeInfo(String userId, String diagnosis, String finalDiagnosis) {
+		if(userId == null || !userId.matches("[0-9]+")) {
+			return new ValidatorResult(false, ValidatorMessage.invalidIdMessage);
+		}
+		if(diagnosis == null || diagnosis.isEmpty()) {
+			return new ValidatorResult(false, ValidatorMessage.invalidDiagnosisMessage);
+		}
+		if(finalDiagnosis == null || finalDiagnosis.isEmpty()) {
+			return new ValidatorResult(false, ValidatorMessage.invalidFinalDiagnosisMessage);
+		}
+		return new ValidatorResult(true, ValidatorMessage.correctMessage);
+	}
+	
 	private ValidatorResult userFirstNameValidator(String userFirstName) {
 		if (userFirstName == null || userFirstName.isEmpty()) {
 			return new ValidatorResult(false, ValidatorMessage.firstNameEmptyMessage);

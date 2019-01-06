@@ -6,6 +6,7 @@ public class Appointment implements Serializable {
 
 	private static final long serialVersionUID = -1939077644266138661L;
 
+	private int appointmentId;
 	private Doctor appointee;
 	private Patient patient;
 	private User appointmentExecutor;
@@ -69,6 +70,36 @@ public class Appointment implements Serializable {
 		this.treatment = treatment;
 	}
 
+
+	public String getCompletionStatus() {
+		return completionStatus;
+	}
+
+
+	public void setCompletionStatus(String completionStatus) {
+		this.completionStatus = completionStatus;
+	}
+
+
+	public Patient getPatient() {
+		return patient;
+	}
+
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
+
+
+	public int getAppointmentId() {
+		return appointmentId;
+	}
+
+
+	public void setAppointmentId(int appointmentId) {
+		this.appointmentId = appointmentId;
+	}	
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {
@@ -97,26 +128,6 @@ public class Appointment implements Serializable {
 	public String toString() {
 		return "[APPOINTEE:   " + appointee + ",   EXECUTOR:   " + appointmentExecutor + ",   RESOURCES:   medicine : "
 				+ medicine + " | procedure : " + procedure + " | surgery : " + surgery + ",   TREATMENT: " + treatment + "]";
-	}
-
-
-	public String getCompletionStatus() {
-		return completionStatus;
-	}
-
-
-	public void setCompletionStatus(String completionStatus) {
-		this.completionStatus = completionStatus;
-	}
-
-
-	public Patient getPatient() {
-		return patient;
-	}
-
-
-	public void setPatient(Patient patient) {
-		this.patient = patient;
 	}
 
 }

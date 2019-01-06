@@ -7,6 +7,11 @@ public interface ValidatorMessage {
 	String loginTooLongMessage = "Login is too long";
 	String loginSatisfactoryMessage = "Login is satisfactory";
 	
+	String invalidIdMessage = "User id is not valid";
+	String invalidDiagnosisMessage = "User diagnosis is not valid";
+	String invalidFinalDiagnosisMessage = "User final diagnosis is not valid";
+	String correctMessage = "Correct";
+	
 	String passwordEmptyMessage = "Password is empty";
 	String passwordTooShortMessage = "Password is too short";
 	String passwordTooLongMessage = "Password is too long";
@@ -29,4 +34,5 @@ public interface ValidatorMessage {
 	String patientIdNotValid = "Something wrong with a patient info. Try again later";
 	String executorIdNotValid = "Something wrong with an executor info. Try again later";
 	String appointmentTypeNotValid = "Something wrong with an appointment-type info. Try again later";
+	String appointmentIdNotValid = "Something wrong with an appointment id. Try again later";
 }

@@ -1,7 +1,6 @@
 package by.epam.training.web.controller.command;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -12,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import by.epam.training.web.bean.Appointment;
 import by.epam.training.web.bean.Doctor;
 import by.epam.training.web.bean.MedicalTreatment;
 import by.epam.training.web.bean.PatientCuringInfo;
@@ -56,8 +56,13 @@ public class SignIn implements Command {
 					request.getSession(true).setAttribute("appointments", clientService.getMadeAppointments(existingUser.getUserId()));
 					rd = request.getRequestDispatcher("therapistPage");
 				} else {
-					rd = request.getRequestDispatcher(Command.welcomePageJSP);
+					List<Appointment> appointments = clientService.getExecutorAppointments(existingUser.getUserId(), existingUser.getUserType());
+					request.getSession(true).setAttribute("appointments", appointments);
+					rd = request.getRequestDispatcher("executorPage");
 				}
+			} else if(userType.toUpperCase().compareTo("NURSE") == 0) {
+				request.getSession(true).setAttribute("appointments", clientService.getExecutorAppointments(existingUser.getUserId(), existingUser.getUserType()));
+				rd = request.getRequestDispatcher("executorPage");
 			} else {
 				rd = request.getRequestDispatcher(Command.welcomePageJSP);
 			}

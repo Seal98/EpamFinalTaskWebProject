@@ -31,4 +31,12 @@ public interface UserDAO {
 	public void createAppointment(int patientId, int executorId, String treatmentType, String treatment, int doctorId) throws DAOException;
 
 	public List<Appointment> getTherapistAppointments(int therapistId) throws DAOException;
+
+	public List<Appointment> getNurseAppointments(int executorId) throws DAOException;
+
+	public List<Appointment> getDoctorAppointments(int executorId) throws DAOException;
+
+	public void completeAppointment(int parseInt) throws DAOException;
+
+	public void dischargePatient(int patientId, String diagnosis, String finalDiagnosis, Date date) throws DAOException;
 }

@@ -33,7 +33,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div><br>
 	<div style="width: 100%;">
 		<div class="tableNameFont">Appointments:</div>
 		<div class="divTable greenTable">

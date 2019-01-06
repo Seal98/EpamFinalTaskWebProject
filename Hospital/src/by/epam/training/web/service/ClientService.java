@@ -16,6 +16,7 @@ import by.epam.training.web.dao.UserDAO;
 import by.epam.training.web.exception.DAOException;
 import by.epam.training.web.exception.ServiceException;
 import by.epam.training.web.service.validator.AppointmentValidator;
+import by.epam.training.web.service.validator.UserValidator;
 import by.epam.training.web.service.validator.ValidatorHelper;
 import by.epam.training.web.service.validator.ValidatorResult;
 
@@ -161,6 +162,51 @@ public class ClientService {
 			throw new ServiceException(e);
 		}
 		return therapistAppointments;
+	}
+
+	public List<Appointment> getExecutorAppointments(int executorId, String executorType) throws ServiceException {
+		FactoryDAO factoryDao = FactoryDAO.getInstance();
+		UserDAO userDao = factoryDao.getUserDAO();
+		List<Appointment> appointments = null;
+		try {
+			if (executorType.toUpperCase().compareTo("DOCTOR") == 0) {
+				appointments = userDao.getDoctorAppointments(executorId);
+			} else if (executorType.toUpperCase().compareTo("NURSE") == 0) {
+				appointments = userDao.getNurseAppointments(executorId);
+			}
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return appointments;
+	}
+
+	public void completeAppointment(String appointmentId) throws ServiceException {
+		FactoryDAO factoryDao = FactoryDAO.getInstance();
+		UserDAO userDao = factoryDao.getUserDAO();
+		try {
+			ValidatorResult result = ValidatorHelper.getAppointmentValidator().validateId(appointmentId);
+			if(!result.isValid()) {
+				throw new ServiceException(result.getValidationMessage());
+			}
+			userDao.completeAppointment(Integer.parseInt(appointmentId));
+		} catch(DAOException e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+	public void dischargePatient(String userId, String diagnosis, String finalDiagnosis) throws ServiceException {
+			UserValidator validator = ValidatorHelper.getUserValidator();
+			ValidatorResult result = validator.validateDischargeInfo(userId, diagnosis, finalDiagnosis);
+			if(!result.isValid()) {
+				throw new ServiceException(result.getValidationMessage());
+			}
+			try {
+			FactoryDAO factoryDao = FactoryDAO.getInstance();
+			UserDAO userDao = factoryDao.getUserDAO();
+			userDao.dischargePatient(Integer.parseInt(userId), diagnosis, finalDiagnosis, new java.sql.Date(new Date().getTime()));
+			} catch(DAOException e) {
+				throw new ServiceException(e);
+			}
 	}
 	
 }

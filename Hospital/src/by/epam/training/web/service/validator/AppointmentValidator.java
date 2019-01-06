@@ -15,4 +15,11 @@ public class AppointmentValidator {
 		return new ValidatorResult(true, "Correct");
 	}
 	
+	public ValidatorResult validateId(String appointmentId) {
+		if(!appointmentId.matches("[0-9]+")) {
+			return new ValidatorResult(false, ValidatorMessage.appointmentIdNotValid);
+		}
+		return new ValidatorResult(true, "Correct");
+	}
+	
 }

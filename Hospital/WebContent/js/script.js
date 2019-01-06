@@ -97,6 +97,79 @@ function closeForm() {
 	setDefaultFormState();
 }
 
+function completeAppointmen(clickedButton, appointmentId){
+	$.ajax({
+		url : 'completeAppointment',
+		method: 'POST',
+		data : {
+			appointmentId : appointmentId,
+			requestParameter : 'complete_appointment'
+		},
+		success : function(responseText) {
+			if(responseText === "success"){
+			clickedButton.value = "Completed";
+			$(clickedButton).css('background-color','#86E49C');
+			document.getElementById("status" + appointmentId).innerHTML = "completed";
+			clickedButton.disabled = true;
+			}
+		}		
+	});
+}
+
+function openDischargeForm(dischargeButton){
+	patientId = dischargeButton.id;
+	document.getElementById("myDischargeForm").style.display = "block";
+}
+
+function dischargePatient(){
+	var diagnosis = document.getElementById("diagnosis").value;
+	var finalDiagnosis = document.getElementById("finalDiagnosis").value;
+	var uId = patientId.split('discharge')[1];
+	$.ajax({
+		url : 'dischargePatient',
+		method: 'POST',
+		data : {
+			userId : uId,
+			diagnosis : diagnosis,
+			finalDiagnosis : finalDiagnosis,
+			requestParameter : 'discharge_patient'
+		},
+		success : function(responseText) {
+			if(responseText === "success"){
+				var dischargeForm = document.getElementById('dischargedPatientsTable');
+				var dischargeRow = document.createElement('div');
+				dischargeRow.className = 'divTableRow';
+				var rowElements = [];
+				for(var i=0;i<7;i++){
+					rowElements[i] = document.createElement('div');
+					rowElements[i].className = 'divTableCell';
+				}
+				var fn = document.getElementById("p" + uId + "f").textContent;
+				var ln = document.getElementById("p" + uId + "l").textContent;
+				var bd = document.getElementById("p" + uId + "bd").textContent;
+				var ad = document.getElementById("p" + uId + "ad").textContent;
+				rowElements[0].innerHTML = fn;
+				rowElements[1].innerHTML = ln;
+				rowElements[2].innerHTML = bd;
+				rowElements[3].innerHTML = ad;
+				rowElements[4].innerHTML = new Date();
+				rowElements[5].innerHTML = diagnosis;
+				rowElements[6].innerHTML = finalDiagnosis;
+				for(var j = 0; j < 7 ; j++){
+					dischargeRow.appendChild(rowElements[j]);
+				}
+				dischargeForm.appendChild(dischargeRow);
+				document.getElementById("rowAttended" + uId).parentNode.removeChild(document.getElementById("rowAttended" + uId));
+			}
+		}		
+	});
+	closeDischargeForm();
+}
+
+function closeDischargeForm(){
+	document.getElementById("myDischargeForm").style.display = "none";
+}
+
 function handleTreatmentRb(treatmentRb){
 	hideAllTreatmentDb();
 	selectedRb = treatmentRb.value;

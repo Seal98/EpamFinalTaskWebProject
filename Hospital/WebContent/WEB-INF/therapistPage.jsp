@@ -23,19 +23,55 @@
 			</div>
 			<div class="divTableBody">
 				<c:forEach var="patients" items="${sessionScope.attended_patients}">
+				<c:if test="${patients.dischargeStatus == false}">
+					<div class="divTableRow" id="rowAttended<c:out value="${patients.userId}" />">
+						<div class="divTableCell" id="p<c:out value="${patients.userId}" />f"><c:out value="${patients.firstName}" /></div>
+						<div class="divTableCell" id="p<c:out value="${patients.userId}" />l"><c:out value="${patients.lastName}" /></div>
+						<div class="divTableCell" id="p<c:out value="${patients.userId}" />bd"><c:out value="${patients.birthDate}" /></div>
+						<div class="divTableCell" id="p<c:out value="${patients.userId}" />ad"><c:out value="${patients.admissionDate}" /></div>
+						<div class="divTableCell">
+						<input class="reg-buttons" type="submit" onclick="openForm(this);" id="appointment<c:out value="${patients.userId}" />" name="appointmentButton" value="Appoint" /><br />
+						</div>
+						<div class="divTableCell">
+						<input class="reg-buttons" type="submit" onclick="openDischargeForm(this);" id="discharge<c:out value="${patients.userId}" />" name="dischargeButton" value="Discharge" /><br />
+						</div>
+					</div>
+				</c:if>
+				</c:forEach>
+			</div>
+		</div>
+	</div><br>
+	<div style="width: 100%;">
+		<div class="tableNameFont">Discharged patients:</div>
+		<div class="divTable greenTable">
+			<div class="divTableHeading">
+				<div class="divTableRow">
+					<div class="divTableHead">First name</div>
+					<div class="divTableHead">Last name</div>
+					<div class="divTableHead">Birthdate</div>
+					<div class="divTableHead">Admission date</div>
+					<div class="divTableHead">Discharge date</div>
+					<div class="divTableHead">Diagnosis</div>
+					<div class="divTableHead">Final diagnosis</div>															
+				</div>
+			</div>
+			<div class="divTableBody" id="dischargedPatientsTable">
+				<c:forEach var="patients" items="${sessionScope.attended_patients}">
+				<c:if test="${patients.dischargeStatus == true}">
 					<div class="divTableRow">
 						<div class="divTableCell" id="p<c:out value="${patients.userId}" />f"><c:out value="${patients.firstName}" /></div>
 						<div class="divTableCell" id="p<c:out value="${patients.userId}" />l"><c:out value="${patients.lastName}" /></div>
 						<div class="divTableCell"><c:out value="${patients.birthDate}" /></div>
-						<div class="divTableCell">
-							<c:out value="${patients.admissionDate}" />
-						</div>
-						<input class="reg-buttons" type="submit" onclick="openForm(this);" id="appointment<c:out value="${patients.userId}" />" name="appointmentButton" value="Appoint" /><br />
+						<div class="divTableCell"><c:out value="${patients.admissionDate}" /></div>
+						<div class="divTableCell"><c:out value="${patients.dischargeInfo.dischargeDate}" /></div>
+						<div class="divTableCell"><c:out value="${patients.dischargeInfo.diagnosis}" /></div>
+						<div class="divTableCell"><c:out value="${patients.dischargeInfo.finalDiagnosis}" /></div>
 					</div>
+				</c:if>
 				</c:forEach>
 			</div>
 		</div>
-	</div>
+	</div>	
 	<br>
 	<div style="width: 100%;">
 		<div class="tableNameFont">Made appointments:</div>
@@ -75,7 +111,6 @@
 	<div class="form-popup" id="myForm">
   	<form class="form-container">
     <h1>Appointment</h1>
-
     <label for="dropBoxExecutor"><b>Executor:  </b></label>
 		<select id="executorDb" name="dropBoxExecutor" class="selectpicker">
 		<option value="defOpt" disabled selected value> -- select an option -- </option>
@@ -116,6 +151,19 @@
     <button type="button" class="btn cancel" onclick="closeForm();">Close</button>
   </form>
 </div>
+
+<div class="form-popup" id="myDischargeForm">
+  	<form class="form-container">
+    <h1>Discharge form</h1>
+      <label for="diagnosisInput">Diagnosis</label>
+	  <input type="text" id="diagnosis" name="diagnosisInput">
+  	  <label for="finalDiagnosisInput">Final diagnosis</label>
+	  <input type="text" id="finalDiagnosis" name="finalDiagnosisInput">
+    <button type="button" class="btn" onclick="dischargePatient();">Discharge</button>
+    <button type="button" class="btn cancel" onclick="closeDischargeForm();">Close</button>
+  </form>
+</div>
+
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-1.10.2.js" type="text/javascript"></script>

@@ -22,6 +22,14 @@
     <servlet-class>by.epam.training.web.controller.WebController</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>CompleteAppointment</servlet-name>
+    <servlet-class>by.epam.training.web.controller.WebController</servlet-class>
+  </servlet> 
+  <servlet>
+    <servlet-name>DischargePatient</servlet-name>
+    <servlet-class>by.epam.training.web.controller.WebController</servlet-class>
+  </servlet>     
+  <servlet>
     <servlet-name>SignUpPage</servlet-name>
     <jsp-file>/WEB-INF/signUp.jsp</jsp-file>
   </servlet>
@@ -37,6 +45,10 @@
     <servlet-name>TherapistPage</servlet-name>
     <jsp-file>/WEB-INF/therapistPage.jsp</jsp-file>
   </servlet>
+  <servlet>
+    <servlet-name>ExecutorPage</servlet-name>
+    <jsp-file>/WEB-INF/executorPage.jsp</jsp-file>
+  </servlet>  
   <servlet-mapping>
     <servlet-name>WebAppServlet</servlet-name>
     <url-pattern>/authorization</url-pattern>
@@ -69,14 +81,16 @@
     <servlet-name>Appoint</servlet-name>
     <url-pattern>/appoint</url-pattern>
   </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>Test</display-name>
-    <servlet-name>Test</servlet-name>
-    <servlet-class>by.epam.training.web.controller.Test</servlet-class>
-  </servlet>
   <servlet-mapping>
-    <servlet-name>Test</servlet-name>
-    <url-pattern>/Test</url-pattern>
+    <servlet-name>ExecutorPage</servlet-name>
+    <url-pattern>/executorPage</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CompleteAppointment</servlet-name>
+    <url-pattern>/completeAppointment</url-pattern>
+  </servlet-mapping>  
+  <servlet-mapping>
+    <servlet-name>DischargePatient</servlet-name>
+    <url-pattern>/dischargePatient</url-pattern>
+  </servlet-mapping>    
 </web-app>
