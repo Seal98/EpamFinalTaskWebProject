@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.sql.Date;
 import java.util.List;
@@ -15,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import by.epam.training.web.bean.Appointment;
 import by.epam.training.web.bean.Doctor;
+import by.epam.training.web.bean.MedicalTreatment;
 import by.epam.training.web.bean.Medicine;
 import by.epam.training.web.bean.Patient;
 import by.epam.training.web.bean.PatientCuringInfo;
@@ -33,7 +33,8 @@ public class SQLUserDAO implements UserDAO {
 
 	private static final ConnectionPoolDAO connectionPool = new ConnectionPoolDAO("jdbc:mysql://localhost:3306/webapp",
 			"root", "root");
-	private List<User> users = new ArrayList<>();
+	private List<User> users = new LinkedList<>();
+	private List<MedicalTreatment> treatment = new LinkedList<>();
 	public static final String getAllUsersDBQuery = "SELECT * from users";
 	public static final String getAllDoctorsDBQuery = "SELECT * from doctors";
 	public static final String getAllPatientsDBQuery = "SELECT * from patients";
@@ -41,8 +42,8 @@ public class SQLUserDAO implements UserDAO {
 
 	public static final String insertUserDBQuery = "INSERT into users(login, password) values(?, ?)";
 	public static final String getAttendedDoctor = "select * from doctors where id = (select attended_doctor_id from patients where login_data_id=?)";
-	public static final String getPatientAppointmentsNursesExecutors = "select a.id, a.appointed_doctor_id, a.procedure, a.medicine, a.surgery, n.nurse_id from appointments a inner join nurses_executors n on n.appointment_id = a.id where patient_id = (select id from patients where login_data_id=?)";
-	public static final String getPatientAppointmentsDoctorsExecutors = "select a.id, a.appointed_doctor_id, a.procedure, a.medicine, a.surgery, n.doctor_id from appointments a inner join doctors_executors n on n.appointment_id = a.id where patient_id = (select id from patients where login_data_id=?);";
+	public static final String getPatientAppointmentsNursesExecutors = "select a.id, a.appointed_doctor_id, a.procedures, a.medicine, a.surgery, a.completion_status, n.nurse_id from appointments a inner join nurses_executors n on n.appointment_id = a.id where patient_id = (select id from patients where login_data_id=?)";
+	public static final String getPatientAppointmentsDoctorsExecutors = "select a.id, a.appointed_doctor_id, a.procedures, a.medicine, a.surgery, a.completion_status, n.doctor_id from appointments a inner join doctors_executors n on n.appointment_id = a.id where patient_id = (select id from patients where login_data_id=?);";
 	public static final String insertPatientDBQuery = "INSERT into patients(first_name, last_name, birthdate, admission_date, attended_doctor_id, login_data_id) values(?, ?, ?, ?, ?, ?)";
 	public static final String selectUserByIdDBQuery = "select * from users  where id = ?";
 	public static final String idConst = "id";
@@ -92,120 +93,17 @@ public class SQLUserDAO implements UserDAO {
 			throw new DAOException(e);
 		}
 	}
-
+	
 	@Override
 	public PatientCuringInfo getUserInfo(int userId) throws DAOException {
-		PatientCuringInfo curingInfo = null;
+		PatientCuringInfo curingInfo = new PatientCuringInfo();
 		Connection connection = null;
-		PreparedStatement activeStmt = null;
 		try {
 			connection = connectionPool.getConnection();
-			activeStmt = connection.prepareStatement(getAttendedDoctor);
-			activeStmt.setInt(1, userId);
-			ResultSet usersSet = activeStmt.executeQuery();
-			usersSet.next();
-			int doctorId = usersSet.getInt("login_data_id");
-			Doctor attendedDoctor = null;
-			for (User user : users) {
-				if (user.getUserId() == doctorId) {
-					attendedDoctor = (Doctor) user;
-					break;
-				}
-			}
-			curingInfo = new PatientCuringInfo();
-			curingInfo.setAttendedDoctor(attendedDoctor);
-			/*
-			 * 
-			 * FOR APPOINTMENTS
-			 * 
-			 */
-			activeStmt.close();
+			setAttendedDoctor(curingInfo, userId, connection);
 			List<Appointment> patientAppointments = new LinkedList<>();
-			activeStmt = connection.prepareStatement(getPatientAppointmentsNursesExecutors);
-			activeStmt.setInt(1, userId);
-			ResultSet appointmentsSet = activeStmt.executeQuery();
-			while (appointmentsSet.next()) {
-				PreparedStatement appointeeStmt = connection
-						.prepareStatement("select login_data_id from doctors where id = "
-								+ appointmentsSet.getInt("appointed_doctor_id"));
-				PreparedStatement executorsStmt = connection.prepareStatement(
-						"select login_data_id from nurses where id = " + appointmentsSet.getInt("nurse_id"));
-				ResultSet appointee = appointeeStmt.executeQuery();
-				ResultSet nurseExecutor = executorsStmt.executeQuery();
-				nurseExecutor.next();
-				appointee.next();
-				Appointment appointment = new Appointment();
-				appointment.setProcedure(appointmentsSet.getBoolean("procedure"));
-				appointment.setMedicine(appointmentsSet.getBoolean("medicine"));
-
-				if (appointment.getProcedure()) {
-					appointment.setTreatment(getProcedureForCuringInfo(appointmentsSet.getInt("id"), connection));
-				} else {
-					appointment.setTreatment(getMedicineForCuringInfo(appointmentsSet.getInt("id"), connection));
-				}
-				int appointeeId = appointee.getInt("login_data_id");
-				int executorId = nurseExecutor.getInt("login_data_id");
-				for (User user : users) {
-					if (user.getUserId() == appointeeId) {
-						appointment.setAppointee((Doctor) user);
-						break;
-					}
-				}
-				for (User user : users) {
-					if (user.getUserId() == executorId) {
-						appointment.setAppointmentExecutor(user);
-						break;
-					}
-				}
-				patientAppointments.add(appointment);
-				appointeeStmt.close();
-				nurseExecutor.close();
-			}
-			activeStmt.close();
-
-			activeStmt = connection.prepareStatement(getPatientAppointmentsDoctorsExecutors);
-			activeStmt.setInt(1, userId);
-			appointmentsSet = activeStmt.executeQuery();
-			while (appointmentsSet.next()) {
-				PreparedStatement appointeeStmt = connection
-						.prepareStatement("select login_data_id from doctors where id = "
-								+ appointmentsSet.getInt("appointed_doctor_id"));
-				PreparedStatement executorsStmt = connection.prepareStatement(
-						"select login_data_id from doctors where id = " + appointmentsSet.getInt("doctor_id"));
-				ResultSet appointee = appointeeStmt.executeQuery();
-				ResultSet doctorExecutor = executorsStmt.executeQuery();
-				doctorExecutor.next();
-				appointee.next();
-				Appointment appointment = new Appointment();
-				appointment.setProcedure(appointmentsSet.getBoolean("procedure"));
-				appointment.setMedicine(appointmentsSet.getBoolean("medicine"));
-				appointment.setSurgery(appointmentsSet.getBoolean("surgery"));
-				if (appointment.getProcedure()) {
-					appointment.setTreatment(getProcedureForCuringInfo(appointmentsSet.getInt("id"), connection));
-				} else if (appointment.getSurgery()) {
-					appointment.setTreatment(getSurgeryForCuringInfo(appointmentsSet.getInt("id"), connection));
-				} else {
-					appointment.setTreatment(getMedicineForCuringInfo(appointmentsSet.getInt("id"), connection));
-				}
-				int appointeeId = appointee.getInt("login_data_id");
-				int executorId = doctorExecutor.getInt("login_data_id");
-				for (User user : users) {
-					if (user.getUserId() == appointeeId) {
-						appointment.setAppointee((Doctor) user);
-						break;
-					}
-				}
-				for (User user : users) {
-					if (user.getUserId() == executorId) {
-						appointment.setAppointmentExecutor(user);
-						break;
-					}
-				}
-				patientAppointments.add(appointment);
-				appointeeStmt.close();
-				doctorExecutor.close();
-			}
-			activeStmt.close();
+			getPatientAppointmentsNursesExecutors(userId, patientAppointments, connection);
+			getPatientAppointmentsDoctorsExecutors(userId, patientAppointments, connection);
 			curingInfo.setAppointments(patientAppointments);
 		} catch (SQLException e) {
 			throw new DAOException(e);
@@ -213,13 +111,398 @@ public class SQLUserDAO implements UserDAO {
 			throw new DAOException(e);
 		} finally {
 			connectionPool.putConnection(connection);
-			try {
-				activeStmt.close();
-			} catch (SQLException e) {
-				logger.error(e);
-			}
 		}
 		return curingInfo;
+	}
+
+	@Override
+	public List<Patient> getAttendedPatients(int therapistId) throws DAOException {
+		Connection connection = null;
+		PreparedStatement statement = null;
+		List<Patient> attendedPatients = null;
+		try {
+			connection = connectionPool.getConnection();
+			statement = connection.prepareStatement(
+					"select login_data_id from patients where attended_doctor_id = (select id from doctors where login_data_id = ?)");
+			statement.setInt(1, therapistId);
+			ResultSet patients = statement.executeQuery();
+			attendedPatients = new LinkedList<>();
+			while (patients.next()) {
+				for (User patient : users) {
+					if (patient.getUserId() == patients.getInt("login_data_id")) {
+						attendedPatients.add((Patient) patient);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} catch (InterruptedException e) {
+			throw new DAOException(e);
+		} finally {
+			connectionPool.putConnection(connection);
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				throw new DAOException(e);
+			}
+		}
+		return attendedPatients;
+	}
+
+	@Override
+	public List<User> getExecutors() {
+		List<User> executors = new LinkedList<>();
+		for (User executor : users) {
+			String executorType = executor.getClass().getSimpleName().toUpperCase();
+			if (executorType.compareTo("NURSE") == 0 || (executorType.compareTo("DOCTOR") == 0
+					&& ((Doctor) executor).getSpecialization().toUpperCase().compareTo("THERAPIST") != 0)) {
+				executors.add(executor);
+			}
+		}
+		return executors;
+	}
+
+	@Override
+	public List<MedicalTreatment> getMedicalTreatment() {
+		return treatment;
+	}
+
+	@Override
+	public void createAppointment(int patientId, int executorId, String treatmentType, String treatment, int doctorId)
+			throws DAOException {
+		Connection connection = null;
+		PreparedStatement preparedStmt = null;
+		PreparedStatement userTypeStmt = null;
+		PreparedStatement executorsTableStmt = null;
+		try {
+			connection = connectionPool.getConnection();
+			preparedStmt = connection.prepareStatement("select id from doctors where login_data_id=?");
+			preparedStmt.setInt(1, doctorId);
+			ResultSet doctorSet = preparedStmt.executeQuery();
+			doctorSet.next();
+			int doctorIdInfo = doctorSet.getInt("id");
+			preparedStmt.close();
+			preparedStmt = connection.prepareStatement("select id from patients where login_data_id=?");
+			preparedStmt.setInt(1, patientId);
+			ResultSet patientInfoSet = preparedStmt.executeQuery();
+			patientInfoSet.next();
+			int patientInfoId = patientInfoSet.getInt("id");
+			preparedStmt.close();
+			preparedStmt = connection.prepareStatement(
+					"INSERT into appointments(patient_id, appointed_doctor_id, executor_type, procedures, medicine, surgery) values(?, ?, ?, ?, ?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
+			userTypeStmt = connection.prepareStatement("select type from users where id=?");
+			userTypeStmt.setInt(1, executorId);
+			ResultSet usersSet = userTypeStmt.executeQuery();
+			usersSet.next();
+			String executorType = usersSet.getString("type");
+			connection.setAutoCommit(false);
+			preparedStmt.setInt(1, patientInfoId);
+			preparedStmt.setInt(2, doctorIdInfo);
+			preparedStmt.setString(3, executorType);
+			preparedStmt.setBoolean(4, false);
+			preparedStmt.setBoolean(5, false);
+			preparedStmt.setBoolean(6, false);
+			if (treatmentType.toUpperCase().compareTo("PROCEDURE") == 0) {
+				preparedStmt.setBoolean(4, true);
+			} else if (treatmentType.toUpperCase().compareTo("MEDICINE") == 0) {
+				preparedStmt.setBoolean(5, true);
+			} else if (treatmentType.toUpperCase().compareTo("SURGERY") == 0) {
+				preparedStmt.setBoolean(6, true);
+			}
+			preparedStmt.executeUpdate();
+			ResultSet result = preparedStmt.getGeneratedKeys();
+			result.next();
+			int appointmentId = result.getInt(1);
+			preparedStmt.close();
+			setTreatmentDependencies(connection, appointmentId, treatmentType, treatment);
+			int executorIdInfo = 0;
+			if (executorType.toUpperCase().compareTo("NURSE") == 0) {
+				preparedStmt = connection.prepareStatement("select id from nurses where login_data_id=?");
+				preparedStmt.setInt(1, executorId);
+				ResultSet executorSet = preparedStmt.executeQuery();
+				executorSet.next();
+				executorIdInfo = executorSet.getInt("id");
+				executorsTableStmt = connection
+						.prepareStatement("insert into nurses_executors(appointment_id, nurse_id) values(?, ?)");
+			} else if (executorType.toUpperCase().compareTo("DOCTOR") == 0) {
+				preparedStmt = connection.prepareStatement("select id from doctors where login_data_id=?");
+				preparedStmt.setInt(1, executorId);
+				ResultSet executorSet = preparedStmt.executeQuery();
+				executorSet.next();
+				executorIdInfo = executorSet.getInt("id");
+				executorsTableStmt = connection
+						.prepareStatement("insert into doctors_executors(appointment_id, doctor_id) values(?, ?)");
+			}
+			executorsTableStmt.setInt(1, appointmentId);
+			executorsTableStmt.setInt(2, executorIdInfo);
+			executorsTableStmt.executeUpdate();
+			connection.commit();
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} catch (InterruptedException e) {
+			throw new DAOException(e);
+		} finally {
+			connectionPool.putConnection(connection);
+			try {
+				preparedStmt.close();
+				userTypeStmt.close();
+			} catch (SQLException e) {
+				throw new DAOException(e);
+			}
+		}
+	}
+	
+	@Override
+	public List<Appointment> getTherapistAppointments(int therapistId) throws DAOException{
+		Connection connection = null;
+		PreparedStatement therapistAppointmentsStmt = null;
+		List<Appointment> appointments = new LinkedList<>();
+		try {
+			connection = connectionPool.getConnection();
+			therapistAppointmentsStmt = connection.prepareStatement("select ap.id, ap.executor_type, ap.procedures, ap.medicine, ap.surgery, ap.completion_status, p.login_data_id from appointments ap left join patients p on ap.patient_id=p.id where appointed_doctor_id=(select id from doctors where login_data_id=?)");
+			therapistAppointmentsStmt.setInt(1, therapistId);
+			ResultSet appointmentsSet = therapistAppointmentsStmt.executeQuery();
+			PreparedStatement activeStmt = null;
+			while(appointmentsSet.next()) {
+				Appointment appointment = new Appointment();
+				appointment.setPatient((Patient)getUserById(appointmentsSet.getInt("login_data_id")));
+				int appointmentId = appointmentsSet.getInt("id");
+				String executorType = appointmentsSet.getString("executor_type");
+				if(executorType.toUpperCase().compareTo("DOCTOR") == 0) {
+					activeStmt = connection.prepareStatement("select d.login_data_id from appointments ap inner join doctors_executors dex on ap.id=dex.appointment_id inner join doctors d on dex.doctor_id=d.id where ap.id=?");
+				} else if(executorType.toUpperCase().compareTo("NURSE") == 0) {
+					activeStmt = connection.prepareStatement("select n.login_data_id from appointments ap inner join nurses_executors nex on ap.id=nex.appointment_id inner join nurses n on nex.nurse_id=n.id where ap.id=?");				
+				}
+				activeStmt.setInt(1, appointmentId);
+				ResultSet executorSet = activeStmt.executeQuery();
+				executorSet.next();
+				appointment.setAppointmentExecutor(getUserById(executorSet.getInt("login_data_id")));
+				activeStmt.close();
+				appointment.setTreatment(getMedicalTreatmentFromAppointmentSetElement(appointmentsSet, appointmentId, connection));
+				appointment.setCompletionStatus(appointmentsSet.getBoolean("completion_status") ? "completed" : "not completed");
+				appointments.add(appointment);
+			}
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} catch (InterruptedException e) {
+			throw new DAOException(e);
+		} finally {
+			connectionPool.putConnection(connection);
+			try {
+				therapistAppointmentsStmt.close();
+			} catch (SQLException e) {
+				throw new DAOException(e);
+			}
+		}
+		return appointments;
+	}
+	
+	private MedicalTreatment getMedicalTreatmentFromAppointmentSetElement(ResultSet appointmentsSet, int appointmentId, Connection connection) throws SQLException {
+		String treatmentName = null;
+		PreparedStatement treatmentStmt = null;
+		MedicalTreatment treatment = null;
+		if(appointmentsSet.getBoolean("procedures")) {
+			treatment = new Procedure();
+			treatmentStmt = connection.prepareStatement("select p.name from appointments ap inner join appointed_procedures dep on ap.id=dep.appointment_id inner join procedures p on p.id=dep.procedure_id where ap.id=?");
+		} else if(appointmentsSet.getBoolean("medicine")) {
+			treatment = new Medicine();
+			treatmentStmt = connection.prepareStatement("select p.name from appointments ap inner join appointed_medicine dep on ap.id=dep.appointment_id inner join medicine p on p.id=dep.medicine_id where ap.id=?");
+		} else if(appointmentsSet.getBoolean("surgery")) {
+			treatment = new Surgery();
+			treatmentStmt = connection.prepareStatement("select p.name from appointments ap inner join appointed_surgeries dep on ap.id=dep.appointment_id inner join surgeries p on p.id=dep.surgery_id where ap.id=?");
+		}
+		treatmentStmt.setInt(1, appointmentId);
+		ResultSet treatmentSet = treatmentStmt.executeQuery();
+		treatmentSet.next();
+		treatmentName = treatmentSet.getString("name");
+		treatment.setName(treatmentName);
+		return treatment;
+	}
+	
+	private User getUserById(int userId) {
+		User result = null;
+		for(User user : users) {
+			if(user.getUserId() == userId) {
+				result = user;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	private void setAttendedDoctor(PatientCuringInfo curingInfo, int userId, Connection connection) throws SQLException {
+		PreparedStatement activeStmt = connection.prepareStatement(getAttendedDoctor);
+		activeStmt.setInt(1, userId);
+		ResultSet usersSet = activeStmt.executeQuery();
+		usersSet.next();
+		int doctorId = usersSet.getInt("login_data_id");
+		Doctor attendedDoctor = null;
+		for (User user : users) {
+			if (user.getUserId() == doctorId) {
+				attendedDoctor = (Doctor) user;
+				break;
+			}
+		}
+		curingInfo.setAttendedDoctor(attendedDoctor);
+		activeStmt.close();
+	}
+	
+	private void getPatientAppointmentsNursesExecutors(int userId, List<Appointment> patientAppointments, Connection connection) throws SQLException, DAOException {
+		PreparedStatement activeStmt = connection.prepareStatement(getPatientAppointmentsNursesExecutors);
+		activeStmt.setInt(1, userId);
+		ResultSet appointmentsSet = activeStmt.executeQuery();
+		while (appointmentsSet.next()) {
+			PreparedStatement appointeeStmt = connection
+					.prepareStatement("select login_data_id from doctors where id = "
+							+ appointmentsSet.getInt("appointed_doctor_id"));
+			PreparedStatement executorsStmt = connection.prepareStatement(
+					"select login_data_id from nurses where id = " + appointmentsSet.getInt("nurse_id"));
+			ResultSet appointee = appointeeStmt.executeQuery();
+			ResultSet nurseExecutor = executorsStmt.executeQuery();
+			nurseExecutor.next();
+			appointee.next();
+			Appointment appointment = new Appointment();
+			appointment.setProcedure(appointmentsSet.getBoolean("procedures"));
+			appointment.setMedicine(appointmentsSet.getBoolean("medicine"));
+			appointment.setSurgery(appointmentsSet.getBoolean("surgery"));
+			appointment.setCompletionStatus(appointmentsSet.getBoolean("completion_status") ? "completed" : "not completed");
+
+			if (appointment.getProcedure()) {
+				appointment.setTreatment(getProcedureForCuringInfo(appointmentsSet.getInt("id"), connection));
+			} else {
+				appointment.setTreatment(getMedicineForCuringInfo(appointmentsSet.getInt("id"), connection));
+			}
+			int appointeeId = appointee.getInt("login_data_id");
+			int executorId = nurseExecutor.getInt("login_data_id");
+			for (User user : users) {
+				if (user.getUserId() == appointeeId) {
+					appointment.setAppointee((Doctor) user);
+					break;
+				}
+			}
+			for (User user : users) {
+				if (user.getUserId() == executorId) {
+					appointment.setAppointmentExecutor(user);
+					break;
+				}
+			}
+			patientAppointments.add(appointment);
+			appointeeStmt.close();
+			nurseExecutor.close();
+		}
+		activeStmt.close();	
+	}
+
+	private void getPatientAppointmentsDoctorsExecutors(int userId, List<Appointment> patientAppointments, Connection connection) throws SQLException, DAOException {
+		PreparedStatement activeStmt = connection.prepareStatement(getPatientAppointmentsDoctorsExecutors);
+		activeStmt.setInt(1, userId);
+		ResultSet appointmentsSet = activeStmt.executeQuery();
+		while (appointmentsSet.next()) {
+			PreparedStatement appointeeStmt = connection
+					.prepareStatement("select login_data_id from doctors where id = "
+							+ appointmentsSet.getInt("appointed_doctor_id"));
+			PreparedStatement executorsStmt = connection.prepareStatement(
+					"select login_data_id from doctors where id = " + appointmentsSet.getInt("doctor_id"));
+			ResultSet appointee = appointeeStmt.executeQuery();
+			ResultSet doctorExecutor = executorsStmt.executeQuery();
+			doctorExecutor.next();
+			appointee.next();
+			Appointment appointment = new Appointment();
+			appointment.setProcedure(appointmentsSet.getBoolean("procedures"));
+			appointment.setMedicine(appointmentsSet.getBoolean("medicine"));
+			appointment.setSurgery(appointmentsSet.getBoolean("surgery"));
+			appointment.setCompletionStatus(appointmentsSet.getBoolean("completion_status") ? "completed" : "not completed");
+			if (appointment.getProcedure()) {
+				appointment.setTreatment(getProcedureForCuringInfo(appointmentsSet.getInt("id"), connection));
+			} else if (appointment.getSurgery()) {
+				appointment.setTreatment(getSurgeryForCuringInfo(appointmentsSet.getInt("id"), connection));
+			} else {
+				appointment.setTreatment(getMedicineForCuringInfo(appointmentsSet.getInt("id"), connection));
+			}
+			int appointeeId = appointee.getInt("login_data_id");
+			int executorId = doctorExecutor.getInt("login_data_id");
+			for (User user : users) {
+				if (user.getUserId() == appointeeId) {
+					appointment.setAppointee((Doctor) user);
+					break;
+				}
+			}
+			for (User user : users) {
+				if (user.getUserId() == executorId) {
+					appointment.setAppointmentExecutor(user);
+					break;
+				}
+			}
+			patientAppointments.add(appointment);
+			appointeeStmt.close();
+			doctorExecutor.close();
+		}
+	}
+
+	private void setTreatmentDependencies(Connection connection, int appointmentId, String treatmentType,
+			String treatment) throws SQLException {
+		if (treatmentType.toUpperCase().compareTo("PROCEDURE") == 0) {
+			setProcedureDependencies(connection, appointmentId, treatment);
+		} else if (treatmentType.toUpperCase().compareTo("MEDICINE") == 0) {
+			setMedicineDependencies(connection, appointmentId, treatment);
+		} else if (treatmentType.toUpperCase().compareTo("SURGERY") == 0) {
+			setSurgeryDependencies(connection, appointmentId, treatment);
+		}
+	}
+
+	private void setProcedureDependencies(Connection connection, int appointmentId, String treatment)
+			throws SQLException {
+		PreparedStatement procedureStmt = connection.prepareStatement("select id from procedures where name=?");
+		treatment = treatment.substring(0, 1).toUpperCase() + treatment.substring(1).toLowerCase();
+		System.out.println(treatment);
+		procedureStmt.setString(1, treatment);
+		ResultSet procedureIdSet = procedureStmt.executeQuery();
+		procedureIdSet.next();
+		int procedureId = procedureIdSet.getInt("id");
+		PreparedStatement procedureDependencyStmt = connection
+				.prepareStatement("insert into appointed_procedures(procedure_id, appointment_id) values(?, ?)");
+		procedureDependencyStmt.setInt(1, procedureId);
+		procedureDependencyStmt.setInt(2, appointmentId);
+		procedureDependencyStmt.executeUpdate();
+		procedureStmt.close();
+		procedureDependencyStmt.close();
+	}
+
+	private void setSurgeryDependencies(Connection connection, int appointmentId, String treatment)
+			throws SQLException {
+		PreparedStatement surgeryStmt = connection.prepareStatement("select id from surgeries where name=?");
+		treatment = treatment.substring(0, 1).toUpperCase() + treatment.substring(1).toLowerCase();
+		System.out.println(treatment);
+		surgeryStmt.setString(1, treatment);
+		ResultSet procedureIdSet = surgeryStmt.executeQuery();
+		procedureIdSet.next();
+		int surgeryId = procedureIdSet.getInt("id");
+		PreparedStatement surgeryDependencyStmt = connection
+				.prepareStatement("insert into appointed_surgeries(surgery_id, appointment_id) values(?, ?)");
+		surgeryDependencyStmt.setInt(1, surgeryId);
+		surgeryDependencyStmt.setInt(2, appointmentId);
+		surgeryDependencyStmt.executeUpdate();
+		surgeryStmt.close();
+		surgeryDependencyStmt.close();
+	}
+
+	private void setMedicineDependencies(Connection connection, int appointmentId, String treatment)
+			throws SQLException {
+		PreparedStatement medicineStmt = connection.prepareStatement("select id from medicine where name=?");
+		treatment = treatment.substring(0, 1).toUpperCase() + treatment.substring(1).toLowerCase();
+		System.out.println(treatment);
+		medicineStmt.setString(1, treatment);
+		ResultSet procedureIdSet = medicineStmt.executeQuery();
+		procedureIdSet.next();
+		int medicineId = procedureIdSet.getInt("id");
+		PreparedStatement medicineDependencyStmt = connection
+				.prepareStatement("insert into appointed_medicine(medicine_id, appointment_id) values(?, ?)");
+		medicineDependencyStmt.setInt(1, medicineId);
+		medicineDependencyStmt.setInt(2, appointmentId);
+		medicineDependencyStmt.executeUpdate();
+		medicineStmt.close();
+		medicineDependencyStmt.close();
 	}
 
 	private Medicine getMedicineForCuringInfo(int appointmentId, Connection connection)
@@ -291,6 +574,7 @@ public class SQLUserDAO implements UserDAO {
 			loadDoctors(activeStmt, connection);
 			loadNurses(activeStmt, connection);
 			loadPatients(activeStmt, connection);
+			loadTreatment(activeStmt, connection);
 		} catch (SQLException e) {
 			logger.error(e);
 		} catch (DAOException e) {
@@ -331,6 +615,33 @@ public class SQLUserDAO implements UserDAO {
 		while (usersSet.next()) {
 			ResultSet loginSet = getLoginDataFromUsers(activeStmt, con, usersSet.getInt(loginDataIdFKConst));
 			users.add(factory.createUser(usersSet, loginSet));
+		}
+	}
+
+	private void loadTreatment(Statement activeStmt, Connection con) throws SQLException, DAOException {
+		loadMedicine(activeStmt);
+		loadProcedures(activeStmt);
+		loadSurgeries(activeStmt);
+	}
+
+	private void loadMedicine(Statement activeStmt) throws SQLException {
+		ResultSet treatmentSet = activeStmt.executeQuery("select * from medicine");
+		while (treatmentSet.next()) {
+			treatment.add(new Medicine(treatmentSet.getString("name"), treatmentSet.getString("indications")));
+		}
+	}
+
+	private void loadProcedures(Statement activeStmt) throws SQLException {
+		ResultSet treatmentSet = activeStmt.executeQuery("select * from procedures");
+		while (treatmentSet.next()) {
+			treatment.add(new Procedure(treatmentSet.getString("name"), treatmentSet.getString("description")));
+		}
+	}
+
+	private void loadSurgeries(Statement activeStmt) throws SQLException {
+		ResultSet treatmentSet = activeStmt.executeQuery("select * from surgeries");
+		while (treatmentSet.next()) {
+			treatment.add(new Surgery(treatmentSet.getString("name"), treatmentSet.getString("duration")));
 		}
 	}
 

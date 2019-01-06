@@ -10,8 +10,15 @@ public class Surgery extends MedicalTreatment implements Serializable {
 	
 	public Surgery() {
 		super();
+		super.setType("surgery");
 	}
 
+	public Surgery(String name, String duration) {
+		this.duration = duration;
+		super.setName(name);
+		super.setType("surgery");
+	}
+	
 	public String getDuration() {
 		return duration;
 	}

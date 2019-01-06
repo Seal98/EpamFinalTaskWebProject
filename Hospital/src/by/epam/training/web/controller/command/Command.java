@@ -15,6 +15,7 @@ public interface Command {
 	public static final String signUpPageJSP = "signUp";
 	public static final String answerAttribute = "answer";
 	public static final String loginParameter = "login";
+	public static final String idParameter = "id";
 	public static final String passwordParameter = "password";
 	public static final String firstNameParameter = "fname";
 	public static final String lastNameParameter = "lname";

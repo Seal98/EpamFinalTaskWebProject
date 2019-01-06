@@ -16,6 +16,7 @@ public class CommandProvider {
 		repository.put(CommandName.RU, new ChangeLocale());
 		repository.put(CommandName.EN, new ChangeLocale());
 		repository.put(CommandName.WRONG_COMMAND, new WrongCommand());
+		repository.put(CommandName.CREATE_APPOINTMENT, new AppointmentCreator());
 	}
 
 	public Command getCommand(String name) {

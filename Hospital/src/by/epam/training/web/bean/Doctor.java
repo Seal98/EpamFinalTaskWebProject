@@ -9,14 +9,16 @@ public class Doctor extends User implements Serializable {
 
 	private String specialization;
 	private String experience;
-
+	
 	public Doctor() {
 		super();
+		super.setUserType("Doctor");
 	}
 
 	public Doctor(int userID, String login, String password, String firstName, String lastName, Date birthDate,
 			String specialization, String experience) {
 		super(userID, login, password, firstName, lastName, birthDate);
+		super.setUserType("Doctor");
 		this.specialization = specialization;
 		this.experience = experience;
 	}

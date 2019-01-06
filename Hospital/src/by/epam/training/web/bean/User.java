@@ -14,7 +14,8 @@ public class User implements Serializable {
 	private String firstName;
 	private String lastName;
 	private Date birthDate;
-
+	private String userType;
+	
 	public User() {
 		super();
 	}
@@ -105,5 +106,13 @@ public class User implements Serializable {
 	public String toString() {
 		return "ID: " + userId + ",  " + "LOGIN: " + userLogin + ",  PASSWORD: " + userPassword + ",  NAME: "
 				+ firstName + ",  SURNAME: " + lastName + ",  BIRTH_DATE: " + birthDate;
+	}
+
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
 	}
 }

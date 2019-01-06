@@ -25,4 +25,8 @@ public interface ValidatorMessage {
 	String passwordComfirmationEmptyMessage = "Password confirmation is empty";
 	String passwordComfirmationNotEqualsMessage = "Password confirmation is not equals to the original password";
 	String passwordComfirmationSatisfactoryMessage = " Password confirmation is satisfactory";
+	
+	String patientIdNotValid = "Something wrong with a patient info. Try again later";
+	String executorIdNotValid = "Something wrong with an executor info. Try again later";
+	String appointmentTypeNotValid = "Something wrong with an appointment-type info. Try again later";
 }

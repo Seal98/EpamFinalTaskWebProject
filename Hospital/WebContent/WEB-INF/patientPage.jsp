@@ -42,6 +42,7 @@
 					<div class="divTableHead">Appointee</div>
 					<div class="divTableHead">Executor</div>
 					<div class="divTableHead">Treatment</div>
+					<div class="divTableHead">Status</div>
 				</div>
 			</div>
 			<div class="divTableBody">
@@ -55,6 +56,9 @@
 					</div>
 					<div class="divTableCell">
 						<c:out value="${apps.treatment.name}" />
+					</div>
+					<div class="divTableCell">
+						<c:out value="${apps.completionStatus}" />
 					</div>
 				</div>
 				</c:forEach>

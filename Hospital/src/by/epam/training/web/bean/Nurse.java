@@ -11,10 +11,12 @@ public class Nurse extends User implements Serializable {
 	
 	public Nurse() {
 		super();
+		super.setUserType("Nurse");
 	}
 
 	public Nurse(int userID, String login, String password, String firstName, String lastName, Date birthDate, String experience) {
 		super(userID, login, password, firstName, lastName, birthDate);
+		super.setUserType("Nurse");
 		this.experience = experience;
 	}
 

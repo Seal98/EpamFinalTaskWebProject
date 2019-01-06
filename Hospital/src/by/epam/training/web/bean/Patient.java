@@ -12,10 +12,12 @@ public class Patient extends User implements Serializable {
 	
 	public Patient() {
 		super();
+		super.setUserType("Patient");
 	}
 
 	public Patient(int userID, String login, String password, String firstName, String lastName, Date birthDate, Date admissionDate, int attendedDoctorId) {
 		super(userID, login, password, firstName, lastName, birthDate);
+		super.setUserType("Patient");
 		this.setAdmissionDate(new Date(admissionDate.getTime()));
 		this.attendedDoctorId = attendedDoctorId;
 	}

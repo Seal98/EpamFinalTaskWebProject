@@ -7,10 +7,12 @@ public class Appointment implements Serializable {
 	private static final long serialVersionUID = -1939077644266138661L;
 
 	private Doctor appointee;
+	private Patient patient;
 	private User appointmentExecutor;
 	private boolean surgery;
 	private boolean medicine;
 	private boolean procedure;
+	private String completionStatus;
 	private MedicalTreatment treatment;
 	
 	public Appointment() {
@@ -95,6 +97,26 @@ public class Appointment implements Serializable {
 	public String toString() {
 		return "[APPOINTEE:   " + appointee + ",   EXECUTOR:   " + appointmentExecutor + ",   RESOURCES:   medicine : "
 				+ medicine + " | procedure : " + procedure + " | surgery : " + surgery + ",   TREATMENT: " + treatment + "]";
+	}
+
+
+	public String getCompletionStatus() {
+		return completionStatus;
+	}
+
+
+	public void setCompletionStatus(String completionStatus) {
+		this.completionStatus = completionStatus;
+	}
+
+
+	public Patient getPatient() {
+		return patient;
+	}
+
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
 	}
 
 }

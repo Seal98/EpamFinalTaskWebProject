@@ -10,8 +10,15 @@ public class Medicine extends MedicalTreatment implements Serializable {
 	
 	public Medicine() {
 		super();
+		super.setType("medicine");
 	}
 
+	public Medicine(String name, String indications) {
+		this.indications = indications;
+		super.setName(name);
+		super.setType("medicine");
+	}
+	
 	public String getIndications() {
 		return indications;
 	}
