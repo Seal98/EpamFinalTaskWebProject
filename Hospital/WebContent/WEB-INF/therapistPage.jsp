@@ -10,6 +10,13 @@
 <link href="css/style.css" rel='stylesheet' type='text/css'>
 </head>
 <body>
+	<form action="createUser" method="post">
+		<input class="reg-buttons" type="submit" onclick="userLogOut();" id="backToMainPageButton"
+			name="backToMainPageButton" value="Log out" /><br /> <input
+			type="hidden" id="requestParameter" name="requestParameter"
+			value="-1">
+	</form>
+	
 	<div style="width: 100%;">
 		<div class="tableNameFont">Attended patients:</div>
 		<div class="divTable greenTable">
@@ -100,9 +107,20 @@
 						<div class="divTableCell">
 							<c:out value="${apps.treatment.name}" />
 						</div>
-						<div class="divTableCell">
+						<div class="divTableCell" id="statusCell<c:out value="${apps.appointmentId}" />">
 							<c:out value="${apps.completionStatus}" />
 						</div>
+						<div class="divTableCell">
+						<c:if test="${apps.completionStatus.compareTo('not completed') == 0}">
+							<input class="reg-buttons" type="submit" onclick="cancelAppointment(this, <c:out value="${apps.appointmentId}" />);" id="cancelButton<c:out value="${apps.appointmentId}" />" value="Cancel" /><br />
+						</c:if>
+						<c:if test="${apps.completionStatus.compareTo('completed') == 0}">
+  							<input class="reg-buttons" style="background-color: #86E49C" type="submit" value="Completed" disabled/><br />
+						</c:if>
+						<c:if test="${apps.completionStatus.compareTo('canceled') == 0}">
+  							<input class="reg-buttons" style="background-color: #86E49C" type="submit" value="Canceled" disabled/><br />
+						</c:if>	
+						</div>				
 					</div>
 				</c:forEach>
 			</div>

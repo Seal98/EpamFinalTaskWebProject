@@ -27,13 +27,21 @@
 		${first_name_message}: <br />
 		<input type="text" name="fname" value="" /><br /> ${last_name_message}: <br />
 		<input type="text" name="lname" value="" /><br /> ${birthdate_message}: <br />
-		<input type="date" name="bdate" value="" /><br /> ${login_message}:<br />
+		<input type="date" name="bdate" value="" /><br /> 
+		<label for="dropBoxTherapists">Therapist: </label>
+		<select id="therapistDb" name="dropBoxTherapists" class="selectpicker">
+				<option value="defOpt" disabled selected value> -- select an option -- </option>
+	  			<c:forEach var="therapists" items="${sessionScope.therapists}">
+	  				<option value="<c:out value="${therapists.userType}" /> <c:out value="${therapists.userId}" /> <c:out value="${therapists.firstName}" /> <c:out value="${therapists.lastName}" />"><c:out value="${therapists.userType}" /> <c:out value="${therapists.firstName}" /> <c:out value="${therapists.lastName}" /></option>
+				</c:forEach>
+		</select></br>${login_message}:<br />
 		<input type="text" name="login" value="" /><br /> ${password_message}:<br />
 		<input type="password" name="password" value="" /><br /> ${confirm_password_message}:<br />
 		<input type="password" name="passwordConfirm" value="" /><br /> 
 		<input class="reg-buttons" type="submit" onclick="confirmReg();" id="confirmRegButton" name="confirmRegButton" value="${sign_up_message}" /><br />
 		<input class="reg-buttons" type="submit" onclick="backToMain();" id="backToMainPageButton" name="backToMainPageButton" value="${back_message}" /><br />
 		<input type="hidden" id="requestParameter" name="requestParameter" value="-1">
+		<input type="hidden" id="therapistParameter" name="therapistParameter" value="-1">
 		<c:set var = "answer" scope = "session" value = "${sessionScope.answer}"/>
 	<c:if test = "${answer != null}">
          <h3><c:out value="${answer}" /></h3>

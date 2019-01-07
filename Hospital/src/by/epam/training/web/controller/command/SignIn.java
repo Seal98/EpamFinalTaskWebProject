@@ -70,7 +70,7 @@ public class SignIn implements Command {
 			rd.forward(request, response);
 		} catch (ServiceException se) {
 			request.getSession(true).setAttribute(Command.answerAttribute, se.getMessage());
-			logger.info(se.getMessage());
+			logger.info(se);
 			response.sendRedirect(Command.mainPageJSP);
 		}
 	}

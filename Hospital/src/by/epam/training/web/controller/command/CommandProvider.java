@@ -19,6 +19,7 @@ public class CommandProvider {
 		repository.put(CommandName.CREATE_APPOINTMENT, new AppointmentCreator());
 		repository.put(CommandName.COMPLETE_APPOINTMENT, new CompleteAppointment());
 		repository.put(CommandName.DISCHARGE_PATIENT, new DischargePatient());
+		repository.put(CommandName.CANCEL_APPOINTMENT, new CancelAppointment());
 	}
 
 	public Command getCommand(String name) {

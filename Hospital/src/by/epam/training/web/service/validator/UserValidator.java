@@ -15,32 +15,46 @@ public class UserValidator {
 	public static final int PASSWORD_MAX_LENGTH = 15;
 
 	public ValidatorResult userSignInDataValidator(String userLogin, String userPassword) {
-		ValidatorResult result = userLoginValidator(userLogin);
+		ValidatorResult result = new ValidatorResult(true, ValidatorMessage.correctMessage);
+		userLoginValidator(userLogin, result);
 		if (!result.isValid()) {
 			return result;
 		}
-		result = userPasswordValidator(userPassword);
+		userPasswordValidator(userPassword, result);
 		return result;
 	}
 
 	public ValidatorResult userSignUpDataValidator(String userLogin, String userPassword, String userConfirmedPassword,
-			String userFirstName, String userLastName) {
-		ValidatorResult result = userFirstNameValidator(userFirstName);
+			String userFirstName, String userLastName, String therapistId) {
+		ValidatorResult result = new ValidatorResult(true, ValidatorMessage.correctMessage);
+		userFirstNameValidator(userFirstName, result);
 		if (!result.isValid()) {
 			return result;
 		}
-		result = userLastNameValidator(userLastName);
+		userLastNameValidator(userLastName, result);
 		if (!result.isValid()) {
 			return result;
 		}
-		result = userLoginValidator(userLogin);
+		userLoginValidator(userLogin, result);
 		if (!result.isValid()) {
 			return result;
 		}
-		result = userPasswordValidator(userPassword, userConfirmedPassword);
+		userIdValidator(result, therapistId);
+		if (!result.isValid()) {
+			return result;
+		}		
+		userPasswordValidator(userPassword, userConfirmedPassword, result);
 		return result;
 	}
 
+	private void userIdValidator(ValidatorResult result, String userId) {
+		System.out.println(userId);
+		if(userId == null || !userId.matches("[0-9]+")) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.invalidIdMessage);
+		}
+	}
+	
 	public ValidatorResult validateDischargeInfo(String userId, String diagnosis, String finalDiagnosis) {
 		if(userId == null || !userId.matches("[0-9]+")) {
 			return new ValidatorResult(false, ValidatorMessage.invalidIdMessage);
@@ -54,71 +68,69 @@ public class UserValidator {
 		return new ValidatorResult(true, ValidatorMessage.correctMessage);
 	}
 	
-	private ValidatorResult userFirstNameValidator(String userFirstName) {
+	private void userFirstNameValidator(String userFirstName, ValidatorResult result) {
 		if (userFirstName == null || userFirstName.isEmpty()) {
-			return new ValidatorResult(false, ValidatorMessage.firstNameEmptyMessage);
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.firstNameEmptyMessage);
+		}else if (userFirstName.length() < FIRST_NAME_MIN_LENGTH) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.firstNameTooShortMessage);
+		}else if (userFirstName.length() > FIRST_NAME_MAX_LENGTH) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.firstNameTooLongMessage);
 		}
-		if (userFirstName.length() < FIRST_NAME_MIN_LENGTH) {
-			return new ValidatorResult(false, ValidatorMessage.firstNameTooShortMessage);
-		}
-		if (userFirstName.length() > FIRST_NAME_MAX_LENGTH) {
-			return new ValidatorResult(false, ValidatorMessage.firstNameTooLongMessage);
-		}
-		return new ValidatorResult(true, ValidatorMessage.firstNameSatisfactoryMessage);
 	}
 
-	private ValidatorResult userLastNameValidator(String userLastName) {
+	private void userLastNameValidator(String userLastName, ValidatorResult result) {
 		if (userLastName == null || userLastName.isEmpty()) {
-			return new ValidatorResult(false, ValidatorMessage.lastNameEmptyMessage);
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.lastNameEmptyMessage);
+		}else if (userLastName.length() < LAST_NAME_MIN_LENGTH) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.lastNameTooShortMessage);
+		}else if (userLastName.length() > LAST_NAME_MAX_LENGTH) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.lastNameTooLongMessage);
 		}
-		if (userLastName.length() < LAST_NAME_MIN_LENGTH) {
-			return new ValidatorResult(false, ValidatorMessage.lastNameTooShortMessage);
-		}
-		if (userLastName.length() > LAST_NAME_MAX_LENGTH) {
-			return new ValidatorResult(false, ValidatorMessage.lastNameTooLongMessage);
-		}
-		return new ValidatorResult(true, ValidatorMessage.lastNameSatisfactoryMessage);
 	}
 
-	private ValidatorResult userLoginValidator(String userLogin) {
+	private void userLoginValidator(String userLogin, ValidatorResult result) {
 		if (userLogin == null || userLogin.isEmpty()) {
-			return new ValidatorResult(false, ValidatorMessage.loginEmptyMessage);
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.loginEmptyMessage);
+		}else if (userLogin.length() < LOGIN_MIN_LENGTH) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.loginTooShortMessage);
+		}else if (userLogin.length() > LOGIN_MAX_LENGTH) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.loginTooLongMessage);
 		}
-		if (userLogin.length() < LOGIN_MIN_LENGTH) {
-			return new ValidatorResult(false, ValidatorMessage.loginTooShortMessage);
-		}
-		if (userLogin.length() > LOGIN_MAX_LENGTH) {
-			return new ValidatorResult(false, ValidatorMessage.loginTooLongMessage);
-		}
-		return new ValidatorResult(true, ValidatorMessage.loginSatisfactoryMessage);
 	}
 
-	private ValidatorResult userPasswordValidator(String userPassword) {
+	private void userPasswordValidator(String userPassword, ValidatorResult result) {
 		if (userPassword == null || userPassword.isEmpty()) {
-			return new ValidatorResult(false, ValidatorMessage.passwordEmptyMessage);
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.passwordEmptyMessage);
+		}else if (userPassword.length() < PASSWORD_MIN_LENGTH) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.passwordTooShortMessage);
+		}else if (userPassword.length() > PASSWORD_MAX_LENGTH) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.passwordTooLongMessage);
 		}
-		if (userPassword.length() < PASSWORD_MIN_LENGTH) {
-			return new ValidatorResult(false, ValidatorMessage.passwordTooShortMessage);
-		}
-		if (userPassword.length() > PASSWORD_MAX_LENGTH) {
-			return new ValidatorResult(false, ValidatorMessage.passwordTooLongMessage);
-		}
-		return new ValidatorResult(true, ValidatorMessage.passwordSatisfactoryMessage);
 	}
 
-	private ValidatorResult userPasswordValidator(String userPassword, String userConfirmedPassword) {
-		ValidatorResult result = userPasswordValidator(userPassword);
+	private void userPasswordValidator(String userPassword, String userConfirmedPassword, ValidatorResult result) {
+		userPasswordValidator(userPassword, result);
 		if (!result.isValid()) {
-			return result;
+			return;
+		}else if (userConfirmedPassword == null || userConfirmedPassword.isEmpty()) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.passwordComfirmationEmptyMessage);
+		}else if (userPassword.compareTo(userConfirmedPassword) != 0) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.passwordComfirmationNotEqualsMessage);
 		}
-		if (userConfirmedPassword == null || userConfirmedPassword.isEmpty()) {
-			return new ValidatorResult(false, ValidatorMessage.passwordComfirmationEmptyMessage);
-		}
-		if (userPassword.compareTo(userConfirmedPassword) != 0) {
-			return new ValidatorResult(false, ValidatorMessage.passwordComfirmationNotEqualsMessage);
-		}
-		return new ValidatorResult(true,
-				result.getValidationMessage() + ValidatorMessage.passwordComfirmationSatisfactoryMessage);
 	}
 
 }

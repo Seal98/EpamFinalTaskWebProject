@@ -10,6 +10,12 @@
 <link href="css/style.css" rel='stylesheet' type='text/css'>
 </head>
 <body>
+	<form action="createUser" method="post">
+		<input class="reg-buttons" type="submit" onclick="userLogOut();" id="backToMainPageButton"
+			name="backToMainPageButton" value="Log out" /><br /> <input
+			type="hidden" id="requestParameter" name="requestParameter"
+			value="-1">
+	</form>
 	<div style="width: 100%;">
 		<div class="tableNameFont">Appointments:</div>
 		<div class="divTable greenTable">
@@ -31,10 +37,13 @@
 						<div class="divTableCell"><c:out value="${appointments.treatment.name}" /></div>
 						<div class="divTableCell" id="status<c:out value="${appointments.appointmentId}" />"><c:out value="${appointments.completionStatus}" /></div>
 						<c:if test="${appointments.completionStatus.compareTo('not completed') == 0}">
-							<input class="reg-buttons" type="submit" onclick="completeAppointmen(this, <c:out value="${appointments.appointmentId}" />);" name="appointmentButton" id="<c:out value="${appointments.appointmentId}" />" value="Complete" /><br />
+							<input class="reg-buttons" type="submit" onclick="completeAppointment(this, <c:out value="${appointments.appointmentId}" />);" name="appointmentButton" id="<c:out value="${appointments.appointmentId}" />" value="Complete" /><br />
 						</c:if>
 						<c:if test="${appointments.completionStatus.compareTo('completed') == 0}">
-  							<input class="reg-buttons" style="background-color: #86E49C" type="submit" onclick="completeAppointmen(this, <c:out value="${appointments.appointmentId}" />);" name="appointmentButton" id="<c:out value="${appointments.appointmentId}" />" value="Completed" disabled/><br />
+  							<input class="reg-buttons" style="background-color: #86E49C" type="submit" name="appointmentButton" id="<c:out value="${appointments.appointmentId}" />" value="Completed" disabled/><br />
+						</c:if>
+						<c:if test="${appointments.completionStatus.compareTo('canceled') == 0}">
+  							<input class="reg-buttons" style="background-color: #86E49C" type="submit" name="appointmentButton" id="<c:out value="${appointments.appointmentId}" />" value="Canceled" disabled/><br />
 						</c:if>
 					</div>
 				</c:forEach>

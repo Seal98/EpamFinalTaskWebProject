@@ -27,10 +27,11 @@ public class ConfirmReg implements Command {
 		String login = request.getParameter(Command.loginParameter);
 		String password = request.getParameter(Command.passwordParameter);
 		String confirmedPassword = request.getParameter(Command.passwordConfirmParameter);
-		
+		String therapistId = request.getParameter(Command.therapistParameter);
+		System.out.println(therapistId);
 		try {
 			String birthdate = request.getParameter(Command.birthDateParameter);
-			clientService.signUp(login, password, confirmedPassword, firstName, lastName, birthdate);
+			clientService.signUp(login, password, confirmedPassword, firstName, lastName, birthdate, therapistId);
 			//dispatcher = request.getRequestDispatcher(Command.mainPageJSP);
 			request.getSession(true).setAttribute(Command.answerAttribute, Command.registrationConfirmedMessage);
 			response.sendRedirect(Command.mainPageJSP);

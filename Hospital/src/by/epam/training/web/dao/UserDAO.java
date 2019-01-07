@@ -18,7 +18,7 @@ public interface UserDAO {
 	public User signIn(String login, String password) throws DAOException;
 
 	public void registration(String login, String password, String firstName, String lastName, Date birthdate,
-			Date admissionDate) throws DAOException;
+			Date admissionDate, int therapistId) throws DAOException;
 
 	public PatientCuringInfo getUserInfo(int userId) throws DAOException;
 	
@@ -28,7 +28,7 @@ public interface UserDAO {
 	
 	public List<MedicalTreatment> getMedicalTreatment();
 
-	public void createAppointment(int patientId, int executorId, String treatmentType, String treatment, int doctorId) throws DAOException;
+	public int createAppointment(int patientId, int executorId, String treatmentType, String treatment, int doctorId) throws DAOException;
 
 	public List<Appointment> getTherapistAppointments(int therapistId) throws DAOException;
 
@@ -39,4 +39,8 @@ public interface UserDAO {
 	public void completeAppointment(int parseInt) throws DAOException;
 
 	public void dischargePatient(int patientId, String diagnosis, String finalDiagnosis, Date date) throws DAOException;
+
+	public void cancelAppointment(int appointmentId) throws DAOException;
+
+	public List<User> getTherapists() throws DAOException;
 }

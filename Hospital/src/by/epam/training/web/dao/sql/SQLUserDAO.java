@@ -48,6 +48,8 @@ public class SQLUserDAO implements UserDAO {
 	public static final String getPatientAppointmentsDoctorsExecutors = "select a.id, a.appointed_doctor_id, a.procedures, a.medicine, a.surgery, a.completion_status, n.doctor_id from appointments a inner join doctors_executors n on n.appointment_id = a.id where patient_id = (select id from patients where login_data_id=?);";
 	public static final String insertPatientDBQuery = "INSERT into patients(first_name, last_name, birthdate, admission_date, attended_doctor_id, login_data_id) values(?, ?, ?, ?, ?, ?)";
 	public static final String selectUserByIdDBQuery = "select * from users  where id = ?";
+	public static final String selectDoctorByIdQuery = "select * from doctors where login_data_id = ?";
+	public static final String getTherapistsDBQuery = "select u.id from users u inner join doctors d where u.id = d.login_data_id and d.speciality = 'therapist'";
 	public static final String idConst = "id";
 	public static final String loginConst = "login";
 	public static final String passwordConst = "password";
@@ -82,13 +84,13 @@ public class SQLUserDAO implements UserDAO {
 
 	@Override
 	public void registration(String login, String password, String firstName, String lastName, Date birthDate,
-			Date admissionDate) throws DAOException {
+			Date admissionDate, int therapistId) throws DAOException {
 		try {
 			User existingUser = getExistingUser(login);
 			if (existingUser != null) {
 				throw new DAOException(UserDAO.userAlreadyExistMessage);
 			} else {
-				createUser(login, password, firstName, lastName, birthDate, admissionDate);
+				createUser(login, password, firstName, lastName, birthDate, admissionDate, therapistId);
 			}
 		} catch (DAOException e) {
 			throw e;
@@ -171,12 +173,13 @@ public class SQLUserDAO implements UserDAO {
 	}
 
 	@Override
-	public void createAppointment(int patientId, int executorId, String treatmentType, String treatment, int doctorId)
+	public int createAppointment(int patientId, int executorId, String treatmentType, String treatment, int doctorId)
 			throws DAOException {
 		Connection connection = null;
 		PreparedStatement preparedStmt = null;
 		PreparedStatement userTypeStmt = null;
 		PreparedStatement executorsTableStmt = null;
+		int newAppointmentId = -1;
 		try {
 			connection = connectionPool.getConnection();
 			preparedStmt = connection.prepareStatement("select id from doctors where login_data_id=?");
@@ -216,9 +219,9 @@ public class SQLUserDAO implements UserDAO {
 			preparedStmt.executeUpdate();
 			ResultSet result = preparedStmt.getGeneratedKeys();
 			result.next();
-			int appointmentId = result.getInt(1);
+			newAppointmentId = result.getInt(1);
 			preparedStmt.close();
-			setTreatmentDependencies(connection, appointmentId, treatmentType, treatment);
+			setTreatmentDependencies(connection, newAppointmentId, treatmentType, treatment);
 			int executorIdInfo = 0;
 			if (executorType.toUpperCase().compareTo("NURSE") == 0) {
 				preparedStmt = connection.prepareStatement("select id from nurses where login_data_id=?");
@@ -237,7 +240,7 @@ public class SQLUserDAO implements UserDAO {
 				executorsTableStmt = connection
 						.prepareStatement("insert into doctors_executors(appointment_id, doctor_id) values(?, ?)");
 			}
-			executorsTableStmt.setInt(1, appointmentId);
+			executorsTableStmt.setInt(1, newAppointmentId);
 			executorsTableStmt.setInt(2, executorIdInfo);
 			executorsTableStmt.executeUpdate();
 			connection.commit();
@@ -254,6 +257,7 @@ public class SQLUserDAO implements UserDAO {
 				throw new DAOException(e);
 			}
 		}
+		return newAppointmentId;
 	}
 
 	@Override
@@ -287,8 +291,8 @@ public class SQLUserDAO implements UserDAO {
 				activeStmt.close();
 				appointment.setTreatment(
 						getMedicalTreatmentFromAppointmentSetElement(appointmentsSet, appointmentId, connection));
-				appointment.setCompletionStatus(
-						appointmentsSet.getBoolean("completion_status") ? "completed" : "not completed");
+				appointment.setCompletionStatus(appointmentsSet.getString("completion_status"));
+				appointment.setAppointmentId(appointmentId);
 				appointments.add(appointment);
 			}
 		} catch (SQLException e) {
@@ -365,8 +369,7 @@ public class SQLUserDAO implements UserDAO {
 				appointment.setAppointee((Doctor) getUserById(doctorSet.getInt("login_data_id")));
 				appointment.setTreatment(
 						getMedicalTreatmentFromAppointmentSetElement(appointmentsSet, appointmentId, connection));
-				appointment.setCompletionStatus(
-						appointmentsSet.getBoolean("completion_status") ? "completed" : "not completed");
+				appointment.setCompletionStatus(appointmentsSet.getString("completion_status"));
 				appointment.setAppointmentId(appointmentId);
 				appointments.add(appointment);
 				doctorStmt.close();
@@ -419,8 +422,7 @@ public class SQLUserDAO implements UserDAO {
 				appointment.setAppointee((Doctor) getUserById(doctorSet.getInt("login_data_id")));
 				appointment.setTreatment(
 						getMedicalTreatmentFromAppointmentSetElement(appointmentsSet, appointmentId, connection));
-				appointment.setCompletionStatus(
-						appointmentsSet.getBoolean("completion_status") ? "completed" : "not completed");
+				appointment.setCompletionStatus(appointmentsSet.getString("completion_status"));
 				appointment.setAppointmentId(appointmentId);
 				appointments.add(appointment);
 				doctorStmt.close();
@@ -446,7 +448,7 @@ public class SQLUserDAO implements UserDAO {
 		PreparedStatement appointmentStmt = null;
 			try {
 				connection = connectionPool.getConnection();
-				appointmentStmt = connection.prepareStatement("update appointments set completion_status = 1 where id = ?");
+				appointmentStmt = connection.prepareStatement("update appointments set completion_status = 'completed' where id = ?");
 				appointmentStmt.setInt(1, appointmentId);
 				appointmentStmt.executeUpdate();
 			} catch (SQLException e) {
@@ -497,6 +499,49 @@ public class SQLUserDAO implements UserDAO {
 		}
 	}
 	
+	@Override
+	public void cancelAppointment(int appointmentId) throws DAOException {
+		Connection connection = null;
+		PreparedStatement cancelStmt = null;
+		try {
+			connection = connectionPool.getConnection();
+			cancelStmt = connection.prepareStatement("update appointments set completion_status = 'canceled' where id = ?");
+			cancelStmt.setInt(1, appointmentId);
+			cancelStmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} catch (InterruptedException e) {
+			throw new DAOException(e);
+		}
+	}
+	
+	@Override
+	public List<User> getTherapists() throws DAOException {
+		Connection connection = null;
+		Statement therapistsStmt = null;
+		List<User> therapists = new LinkedList<>();
+		try {
+			connection = connectionPool.getConnection();
+			therapistsStmt = connection.createStatement();
+			ResultSet therapistsSet = therapistsStmt.executeQuery(getTherapistsDBQuery);
+			while(therapistsSet.next()) {
+				therapists.add(getUserById(therapistsSet.getInt("id")));
+			}
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} catch (InterruptedException e) {
+			throw new DAOException(e);
+		} finally {
+			connectionPool.putConnection(connection);
+			try {
+				therapistsStmt.close();
+			} catch (SQLException e) {
+				throw new DAOException(e);
+			}
+		}
+		return therapists;
+	}
+	
 	private User getUserById(int userId) {
 		User result = null;
 		for (User user : users) {
@@ -544,8 +589,7 @@ public class SQLUserDAO implements UserDAO {
 			appointment.setProcedure(appointmentsSet.getBoolean("procedures"));
 			appointment.setMedicine(appointmentsSet.getBoolean("medicine"));
 			appointment.setSurgery(appointmentsSet.getBoolean("surgery"));
-			appointment.setCompletionStatus(
-					appointmentsSet.getBoolean("completion_status") ? "completed" : "not completed");
+			appointment.setCompletionStatus(appointmentsSet.getString("completion_status"));
 
 			if (appointment.getProcedure()) {
 				appointment.setTreatment(getProcedureForCuringInfo(appointmentsSet.getInt("id"), connection));
@@ -591,8 +635,7 @@ public class SQLUserDAO implements UserDAO {
 			appointment.setProcedure(appointmentsSet.getBoolean("procedures"));
 			appointment.setMedicine(appointmentsSet.getBoolean("medicine"));
 			appointment.setSurgery(appointmentsSet.getBoolean("surgery"));
-			appointment.setCompletionStatus(
-					appointmentsSet.getBoolean("completion_status") ? "completed" : "not completed");
+			appointment.setCompletionStatus(appointmentsSet.getString("completion_status"));
 			if (appointment.getProcedure()) {
 				appointment.setTreatment(getProcedureForCuringInfo(appointmentsSet.getInt("id"), connection));
 			} else if (appointment.getSurgery()) {
@@ -850,16 +893,22 @@ public class SQLUserDAO implements UserDAO {
 	}
 
 	private void createUser(String login, String password, String firstName, String lastName, Date birthdate,
-			Date admissionDate) throws DAOException, SQLException {
+			Date admissionDate, int therapistId) throws DAOException, SQLException {
 		Connection connection = null;
 		PreparedStatement insertUserStmt = null;
 		PreparedStatement insertPatientStmt = null;
+		PreparedStatement selectDoctorStmt = null;
 		try {
 			try {
 				connection = connectionPool.getConnection();
 			} catch (InterruptedException e) {
 				logger.error(e);
 			}
+			selectDoctorStmt = connection.prepareStatement(selectDoctorByIdQuery);
+			selectDoctorStmt.setInt(1, therapistId);
+			ResultSet doctorSet = selectDoctorStmt.executeQuery();
+			doctorSet.next();
+			int therapistIdInfo = doctorSet.getInt("id");
 			connection.setAutoCommit(false);
 			insertUserStmt = connection.prepareStatement(insertUserDBQuery, Statement.RETURN_GENERATED_KEYS);
 			insertUserStmt.setString(1, login);
@@ -873,10 +922,10 @@ public class SQLUserDAO implements UserDAO {
 			insertPatientStmt.setString(2, lastName);
 			insertPatientStmt.setDate(3, birthdate);
 			insertPatientStmt.setDate(4, admissionDate);
-			insertPatientStmt.setInt(5, 1);
+			insertPatientStmt.setInt(5, therapistIdInfo);
 			insertPatientStmt.setInt(6, lastId);
 			insertPatientStmt.executeUpdate();
-			users.add(new Patient(lastId, login, password, firstName, lastName, birthdate, admissionDate, 1, false));
+			users.add(new Patient(lastId, login, password, firstName, lastName, birthdate, admissionDate, therapistIdInfo, false));
 			connection.commit();
 		} catch (SQLException e) {
 			throw new DAOException(e);
@@ -884,6 +933,7 @@ public class SQLUserDAO implements UserDAO {
 			connectionPool.putConnection(connection);
 			insertUserStmt.close();
 			insertPatientStmt.close();
+			selectDoctorStmt.close();
 		}
 	}
 

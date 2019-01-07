@@ -9,6 +9,12 @@
 <link href="css/style.css" rel='stylesheet' type='text/css'>
 </head>
 <body>
+	<form action="createUser" method="post">
+		<input class="reg-buttons" type="submit" onclick="userLogOut();" id="backToMainPageButton"
+			name="backToMainPageButton" value="Log out" /><br /> <input
+			type="hidden" id="requestParameter" name="requestParameter"
+			value="-1">
+	</form>
 	<div style="width: 100%;">
 		<div class="tableNameFont">Attended doctor:</div>
 		<div class="divTable greenTable">
@@ -52,7 +58,7 @@
 						<c:out value="${apps.appointee.firstName}" /> <c:out value="${apps.appointee.lastName}" />
 					</div>
 					<div class="divTableCell">
-						<c:out value="${apps.appointmentExecutor.firstName}" /> <c:out value="${apps.appointmentExecutor.lastName}" />
+						<c:out value="${apps.appointmentExecutor.userType}" /> <c:out value="${apps.appointmentExecutor.firstName}" /> <c:out value="${apps.appointmentExecutor.lastName}" />
 					</div>
 					<div class="divTableCell">
 						<c:out value="${apps.treatment.name}" />

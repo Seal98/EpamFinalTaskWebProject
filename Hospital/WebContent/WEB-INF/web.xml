@@ -14,6 +14,10 @@
     <servlet-class>by.epam.training.web.controller.WebController</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>CancelAppointment</servlet-name>
+    <servlet-class>by.epam.training.web.controller.WebController</servlet-class>
+  </servlet>  
+  <servlet>
     <servlet-name>ChangeLocale</servlet-name>
     <servlet-class>by.epam.training.web.controller.WebController</servlet-class>
   </servlet>
@@ -93,4 +97,8 @@
     <servlet-name>DischargePatient</servlet-name>
     <url-pattern>/dischargePatient</url-pattern>
   </servlet-mapping>    
+  <servlet-mapping>
+    <servlet-name>CancelAppointment</servlet-name>
+    <url-pattern>/cancelAppointment</url-pattern>
+  </servlet-mapping>  
 </web-app>

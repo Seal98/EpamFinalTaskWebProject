@@ -20,6 +20,7 @@ public interface Command {
 	public static final String firstNameParameter = "fname";
 	public static final String lastNameParameter = "lname";
 	public static final String birthDateParameter = "bdate";
+	public static final String therapistParameter = "therapistParameter";
 	public static final String passwordConfirmParameter = "passwordConfirm";
 	public static final String registrationConfirmedMessage = "You have been registered";
 	public static final String wrongCommandMessage = "Wrong command";

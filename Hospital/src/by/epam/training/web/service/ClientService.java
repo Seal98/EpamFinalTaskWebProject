@@ -39,9 +39,9 @@ public class ClientService {
 	}
 
 	public void signUp(String login, String password, String confirmedPassword, String firstName, String lastName,
-			String birthdateStr) throws ServiceException {
+			String birthdateStr, String therapistId) throws ServiceException {
 		ValidatorResult result = ValidatorHelper.getUserValidator().userSignUpDataValidator(login, password,
-				confirmedPassword, firstName, lastName);
+				confirmedPassword, firstName, lastName, therapistId);
 		if (!result.isValid()) {
 			throw new ServiceException(result.getValidationMessage());
 		}
@@ -51,7 +51,7 @@ public class ClientService {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 			Date birthdate = format.parse(birthdateStr);
 			userDao.registration(login, password, firstName, lastName, new java.sql.Date(birthdate.getTime()),
-					new java.sql.Date(new Date().getTime()));
+					new java.sql.Date(new Date().getTime()), Integer.parseInt(therapistId));
 		} catch (DAOException e) {
 			throw new ServiceException(e.getMessage(), e);
 		} catch (ParseException e) {
@@ -134,9 +134,10 @@ public class ClientService {
 		return surgeries;
 	}
 
-	public void createAppointment(String patientIdStr, String executorIdStr, String treatmentTypeStr,
+	public int createAppointment(String patientIdStr, String executorIdStr, String treatmentTypeStr,
 			String treatmentStr, String doctorId) throws ServiceException {
 		AppointmentValidator validator = ValidatorHelper.getAppointmentValidator();
+		int appointmentId = -1;
 		ValidatorResult result = validator.validate(patientIdStr, executorIdStr, treatmentTypeStr);
 		if (!result.isValid()) {
 			throw new ServiceException(result.getValidationMessage());
@@ -146,10 +147,11 @@ public class ClientService {
 		int executorId = Integer.parseInt(executorIdStr);
 		String treatmentType = treatmentTypeStr.split("Rb")[0];
 		try {
-			userDao.createAppointment(patientId, executorId, treatmentType, treatmentStr, Integer.parseInt(doctorId));
+			appointmentId = userDao.createAppointment(patientId, executorId, treatmentType, treatmentStr, Integer.parseInt(doctorId));
 		} catch (DAOException e) {
 			throw new ServiceException(e);
 		}
+		return appointmentId;
 	}
 
 	public List<Appointment> getMadeAppointments(int therapistId) throws ServiceException {
@@ -207,6 +209,32 @@ public class ClientService {
 			} catch(DAOException e) {
 				throw new ServiceException(e);
 			}
+	}
+	
+	public void cancelAppointment(String appointmentId) throws ServiceException {
+		FactoryDAO factoryDao = FactoryDAO.getInstance();
+		UserDAO userDao = factoryDao.getUserDAO();
+		try {
+			ValidatorResult result = ValidatorHelper.getAppointmentValidator().validateId(appointmentId);
+			if(!result.isValid()) {
+				throw new ServiceException(result.getValidationMessage());
+			}
+			userDao.cancelAppointment(Integer.parseInt(appointmentId));
+		} catch(DAOException e) {
+			throw new ServiceException(e);
+		}		
+	}
+	
+	public List<User> getTherapists() throws ServiceException {
+		FactoryDAO factoryDao = FactoryDAO.getInstance();
+		UserDAO userDao = factoryDao.getUserDAO();
+		List<User> therapists = null;
+		try {
+			therapists = userDao.getTherapists();
+		} catch(DAOException e) {
+			throw new ServiceException(e);
+		}	
+		return therapists;
 	}
 	
 }
