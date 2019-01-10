@@ -20,7 +20,7 @@ public class AppointmentCreator implements Command {
 			String executorId = request.getParameter("executorId");
 			String selectedTreatmentType = request.getParameter("selectedTreatmentType");
 			String selectedTreatment = request.getParameter("selectedTreatment");
-			String doctorId = request.getSession(true).getAttribute(Command.idParameter).toString();
+			String doctorId = request.getParameter(Command.doctorIdParameter).toString();
 			int appointmentId = service.createAppointment(patientId, executorId, selectedTreatmentType, selectedTreatment, doctorId);
 			if(appointmentId == -1) {
 				response.getWriter().print("creation failed");

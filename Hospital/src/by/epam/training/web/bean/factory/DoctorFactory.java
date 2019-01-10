@@ -24,7 +24,7 @@ public class DoctorFactory implements UserFactory {
 	
 	@Override
 	public User createUser(ResultSet usersSet, ResultSet loginSet) throws SQLException {
-		int userId = usersSet.getInt(SQLUserDAO.loginDataIdFKConst);
+		int userId = usersSet.getInt(SQLUserDAO.loginDataIdConst);
 		String userLogin = loginSet.getString(SQLUserDAO.loginConst);
 		String userPassword = loginSet.getString(SQLUserDAO.passwordConst);
 		String userFirstName = usersSet.getString(SQLUserDAO.firstNameConst);

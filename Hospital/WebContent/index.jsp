@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>MyJSP</title>
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${requestScope.locale}"/>
 <fmt:setBundle basename="localization.locale" var="loc" />
 <fmt:message bundle="${loc}" key="locale.enter.login" var="login_message" />
 <fmt:message bundle="${loc}" key="locale.enter.password" var="password_message" />
@@ -32,7 +32,7 @@
 		<input class="auth-buttons" type="submit" name="signUpButton" onclick="signUp();" value="${sign_up_message}" /><br />
 		</div>
 		<input type="hidden" id="requestParameter" name="requestParameter" value="-1">
-	<c:set var = "answer" scope = "session" value = "${sessionScope.answer}"/>
+	<c:set var = "answer" scope = "session" value = "${answer}"/>
 	<c:if test = "${answer != null}">
          <h3><c:out value="${answer}" /></h3>
     </c:if>

@@ -11,7 +11,7 @@ public class Patient extends User implements Serializable {
 	private int attendedDoctorId;
 	private boolean dischargeStatus;
 	private PatientDischargeInfo dischargeInfo;
-	
+
 	public Patient() {
 		super();
 		super.setUserType("Patient");
@@ -40,8 +40,8 @@ public class Patient extends User implements Serializable {
 
 	public void setDischargeInfo(PatientDischargeInfo dischargeInfo) {
 		this.dischargeInfo = dischargeInfo;
-	}	
-	
+	}
+
 	public Date getAdmissionDate() {
 		return admissionDate;
 	}

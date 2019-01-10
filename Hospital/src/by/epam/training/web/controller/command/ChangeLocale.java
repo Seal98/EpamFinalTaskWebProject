@@ -14,7 +14,7 @@ public class ChangeLocale implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ServiceException {
-		request.getSession(true).setAttribute("locale", request.getParameter("requestParameter"));
+		request.setAttribute("locale", request.getParameter("requestParameter"));
 		RequestDispatcher rd = null;
 		String uri = request.getRequestURI().split("/EpamWebProject/")[1];
 		switch(uri) {

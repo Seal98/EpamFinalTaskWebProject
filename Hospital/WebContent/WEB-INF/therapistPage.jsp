@@ -8,15 +8,21 @@
 <title>Insert title here</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <link href="css/style.css" rel='stylesheet' type='text/css'>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<link rel="stylesheet" href="css/bootstrap.css">
+<script src="js/bootstrap.js" type="text/javascript"></script>
+
 </head>
 <body>
 	<form action="createUser" method="post">
-		<input class="reg-buttons" type="submit" onclick="userLogOut();" id="backToMainPageButton"
-			name="backToMainPageButton" value="Log out" /><br /> <input
+		<input class="reg-buttons" type="submit" style="float: left;" onclick="userLogOut();" id="backToMainPageButton"
+			name="backToMainPageButton" value="Log out" /> <input
 			type="hidden" id="requestParameter" name="requestParameter"
 			value="-1">
 	</form>
-	
+		<input class="reg-buttons" type="submit" onclick="userProfileInfo();" id="profileInfoButton"
+			name="profileInfoButton" value="Profile info" /><br />
+			
 	<div style="width: 100%;">
 		<div class="tableNameFont">Attended patients:</div>
 		<div class="divTable greenTable">
@@ -29,7 +35,7 @@
 				</div>
 			</div>
 			<div class="divTableBody">
-				<c:forEach var="patients" items="${sessionScope.attended_patients}">
+				<c:forEach var="patients" items="${requestScope.attended_patients}">
 				<c:if test="${patients.dischargeStatus == false}">
 					<div class="divTableRow" id="rowAttended<c:out value="${patients.userId}" />">
 						<div class="divTableCell" id="p<c:out value="${patients.userId}" />f"><c:out value="${patients.firstName}" /></div>
@@ -63,7 +69,7 @@
 				</div>
 			</div>
 			<div class="divTableBody" id="dischargedPatientsTable">
-				<c:forEach var="patients" items="${sessionScope.attended_patients}">
+				<c:forEach var="patients" items="${requestScope.attended_patients}">
 				<c:if test="${patients.dischargeStatus == true}">
 					<div class="divTableRow">
 						<div class="divTableCell" id="p<c:out value="${patients.userId}" />f"><c:out value="${patients.firstName}" /></div>
@@ -93,7 +99,7 @@
 				</div>
 			</div>
 			<div id="therapistAppointments" class="divTableBody">
-				<c:forEach var="apps" items="${sessionScope.appointments}">
+				<c:forEach var="apps" items="${requestScope.appointments}">
 					<div class="divTableRow">
 						<div class="divTableCell">
 							<c:out value="${apps.patient.firstName}" /> <c:out value="${apps.patient.lastName}" />
@@ -132,7 +138,7 @@
     <label for="dropBoxExecutor"><b>Executor:  </b></label>
 		<select id="executorDb" name="dropBoxExecutor" class="selectpicker">
 		<option value="defOpt" disabled selected value> -- select an option -- </option>
-	  			<c:forEach var="executors" items="${sessionScope.executors}">
+	  			<c:forEach var="executors" items="${requestScope.executors}">
 	  				<option value="<c:out value="${executors.userType}" /> <c:out value="${executors.userId}" /> <c:out value="${executors.firstName}" /> <c:out value="${executors.lastName}" />"><c:out value="${executors.userType}" /> <c:out value="${executors.firstName}" /> <c:out value="${executors.lastName}" /></option>
 				</c:forEach>
 		</select></br>
@@ -147,25 +153,25 @@
 		<label id="medicineLabel" for="dropBoxMedicine" style="display: none;"><b>Medicine:  </b></label>
 		<select id="medicineDb" name="dropBoxMedicine" class="selectpicker" style="display: none;">
 		<option value="defOpt" disabled selected value> -- select an option -- </option>		
-	  		<c:forEach var="medicine" items="${sessionScope.medicine}">
+	  		<c:forEach var="medicine" items="${requestScope.medicine}">
 	  			<option><c:out value="${medicine.name}" /></option>
 			</c:forEach>
 		</select></br>
 		<label id="proceduresLabel" for="dropBoxProcedures" style="display: none;"><b>Procedures:  </b></label>
 		<select id="proceduresDb" name="dropBoxProcedures" class="selectpicker" style="display: none;">
 		<option value="defOpt" disabled selected value> -- select an option -- </option>		
-	  		<c:forEach var="procedures" items="${sessionScope.procedures}">
+	  		<c:forEach var="procedures" items="${requestScope.procedures}">
 	  			<option><c:out value="${procedures.name}" /></option>
 			</c:forEach>
 		</select></br>		
 		<label id="surgeriesLabel" for="dropBoxSurgeries" style="display: none;"><b>Surgeries:  </b></label>
 		<select id="surgeriesDb" name="dropBoxSurgeries" class="selectpicker" style="display: none;">
 		<option value="defOpt" disabled selected value> -- select an option -- </option>		
-	  		<c:forEach var="surgeries" items="${sessionScope.surgeries}">
+	  		<c:forEach var="surgeries" items="${requestScope.surgeries}">
 	  			<option><c:out value="${surgeries.name}" /></option>
 			</c:forEach>
 		</select></br>		
-    <button type="button" class="btn" onclick="makeAppointment();">Appoint</button>
+    <button type="button" class="btn" onclick="makeAppointment(<c:out value="${current_user.userId}" />);">Appoint</button>
     <button type="button" class="btn cancel" onclick="closeForm();">Close</button>
   </form>
 </div>
@@ -179,6 +185,27 @@
 	  <input type="text" id="finalDiagnosis" name="finalDiagnosisInput">
     <button type="button" class="btn" onclick="dischargePatient();">Discharge</button>
     <button type="button" class="btn cancel" onclick="closeDischargeForm();">Close</button>
+  </form>
+</div>
+
+<div class="form-popup" id="ProfileInfo">
+  	<form class="form-container">
+    <h1>Profile info</h1>
+      <label><b>Type:</b> <c:out value="${current_user.userType}" /></label><br>
+      <label><b>First name:</b> <c:out value="${current_user.firstName}" /></label><br> 
+      <label><b>Last name:</b> <c:out value="${current_user.lastName}" /></label><br>
+      <c:if test="${current_user.userType.toUpperCase().compareTo('DOCTOR') == 0}">   
+      <label><b>Specialization:</b> <c:out value="${current_user.specialization}" /></label><br> 
+      <label><b>Experience:</b> <c:out value="${current_user.experience}" /></label><br> 
+      </c:if>  
+      <c:if test="${current_user.userType.toUpperCase().compareTo('NURSE') == 0}">
+      <label><b>Experience:</b> <c:out value="${current_user.experience}" /></label><br> 
+      </c:if>  
+      <c:if test="${current_user.userType.toUpperCase().compareTo('PATIENT') == 0}">   
+      <label><b>Admission date:</b> <c:out value="${current_user.admissionDate}" /></label><br> 
+      <label><b>Attended doctor:</b> <c:out value="${current_user.attended_doctor_fname}" /> <c:out value="${current_user.attended_doctor_fname}" /></label><br> 
+      </c:if>
+    <button type="button" class="btn cancel" onclick="closeProfileForm();">Close</button>
   </form>
 </div>
 

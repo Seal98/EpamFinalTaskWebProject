@@ -17,7 +17,7 @@ public class ConfirmReg implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServiceException, ServletException, IOException {
 		RequestDispatcher dispatcher = null;
-		request.getSession(true).setAttribute(Command.answerAttribute, null);
+		request.setAttribute(Command.answerAttribute, null);
 
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 		ClientService clientService = serviceFactory.getClientService();

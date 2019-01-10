@@ -26,7 +26,7 @@ public class SignIn implements Command {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		request.getSession(true).setAttribute(Command.answerAttribute, null);
+		request.setAttribute(Command.answerAttribute, null);
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 		ClientService clientService = serviceFactory.getClientService();
 		String login = request.getParameter(Command.loginParameter);
@@ -34,51 +34,53 @@ public class SignIn implements Command {
 		RequestDispatcher rd = null;
 		try {
 			User existingUser = clientService.signIn(login, password);
-
+			request.getSession(true).setAttribute(Command.currentUser, existingUser);
 			String userType = existingUser.getClass().getSimpleName();
-			request.getSession(true).setAttribute("userType", userType);
-			request.getSession(true).setAttribute(Command.loginParameter, existingUser.getUserLogin());
+			request.setAttribute(Command.userType, userType);
+			request.setAttribute(Command.loginParameter, existingUser.getUserLogin());
 			request.getSession(true).setAttribute(Command.idParameter, existingUser.getUserId());
 
-			if (userType.toUpperCase().compareTo("PATIENT") == 0) {
+			if (userType.toUpperCase().compareTo(Command.patientUpperCase) == 0) {
 				PatientCuringInfo curingInfo = clientService.getUserInfo(existingUser.getUserId());
-				request.getSession(true).setAttribute("appointments", curingInfo.getAppointments());
+				request.setAttribute(appointments, curingInfo.getAppointments());
 				linkAttendedDoctorInfo(request, curingInfo.getAttendedDoctor());
-				rd = request.getRequestDispatcher("patientPage");
-			} else if (userType.toUpperCase().compareTo("DOCTOR") == 0) {
-				if(((Doctor)existingUser).getSpecialization().toUpperCase().compareTo("THERAPIST") == 0) {
-					request.getSession(true).setAttribute("attended_patients", clientService.getAttendedPatients(existingUser.getUserId()));
-					request.getSession(true).setAttribute("executors", clientService.getExecutors());
+				rd = request.getRequestDispatcher(patientPageJSP);
+			} else if (userType.toUpperCase().compareTo(Command.doctorUpperCase) == 0) {
+				if(((Doctor)existingUser).getSpecialization().toUpperCase().compareTo(Command.therapistUpperCase) == 0) {
+					request.setAttribute(Command.attendedPatients, clientService.getAttendedPatients(existingUser.getUserId()));
+					request.setAttribute(Command.executors, clientService.getExecutors());
 					List<MedicalTreatment> treatment = clientService.getTreatment();
-					request.getSession(true).setAttribute("medicine", clientService.getMedicine(treatment));
-					request.getSession(true).setAttribute("procedures", clientService.getProcedures(treatment));
-					request.getSession(true).setAttribute("surgeries", clientService.getSurgeries(treatment));
-					request.getSession(true).setAttribute("appointments", clientService.getMadeAppointments(existingUser.getUserId()));
-					rd = request.getRequestDispatcher("therapistPage");
+					request.setAttribute(Command.medicine, clientService.getMedicine(treatment));
+					request.setAttribute(Command.procedures, clientService.getProcedures(treatment));
+					request.setAttribute(Command.surgeries, clientService.getSurgeries(treatment));
+					request.setAttribute(Command.appointments, clientService.getMadeAppointments(existingUser.getUserId()));
+					rd = request.getRequestDispatcher(Command.therapistPageJSP);
 				} else {
 					List<Appointment> appointments = clientService.getExecutorAppointments(existingUser.getUserId(), existingUser.getUserType());
-					request.getSession(true).setAttribute("appointments", appointments);
-					rd = request.getRequestDispatcher("executorPage");
+					request.setAttribute(Command.appointments, appointments);
+					rd = request.getRequestDispatcher(Command.executorPageJSP);
 				}
-			} else if(userType.toUpperCase().compareTo("NURSE") == 0) {
-				request.getSession(true).setAttribute("appointments", clientService.getExecutorAppointments(existingUser.getUserId(), existingUser.getUserType()));
-				rd = request.getRequestDispatcher("executorPage");
+			} else if(userType.toUpperCase().compareTo(Command.nurseUpperCase) == 0) {
+				request.setAttribute(Command.appointments, clientService.getExecutorAppointments(existingUser.getUserId(), existingUser.getUserType()));
+				rd = request.getRequestDispatcher(Command.executorPageJSP);
 			} else {
 				rd = request.getRequestDispatcher(Command.welcomePageJSP);
 			}
 
 			rd.forward(request, response);
 		} catch (ServiceException se) {
-			request.getSession(true).setAttribute(Command.answerAttribute, se.getMessage());
+			System.out.println(se);
+			request.setAttribute(Command.answerAttribute, se.getMessage());
 			logger.info(se);
-			response.sendRedirect(Command.mainPageJSP);
+			request.getRequestDispatcher(Command.mainPageJSP).forward(request, response);
+			
 		}
 	}
 	
 	private void linkAttendedDoctorInfo(HttpServletRequest request, User doctor) {
-		request.getSession(true).setAttribute("attended_doctor_fname", doctor.getFirstName());
-		request.getSession(true).setAttribute("attended_doctor_lname", doctor.getLastName());
-		request.getSession(true).setAttribute("attended_doctor_specialization", ((Doctor) doctor).getSpecialization());
+		request.setAttribute(Command.attendedDoctorFName, doctor.getFirstName());
+		request.setAttribute(Command.attendedDoctorLName, doctor.getLastName());
+		request.setAttribute(Command.attendedDoctorSpecialization, ((Doctor) doctor).getSpecialization());
 	}
 
 }

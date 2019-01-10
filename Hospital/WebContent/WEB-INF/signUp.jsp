@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${locale}"/>
 <fmt:setBundle basename="localization.locale" var="loc" />
 <fmt:message bundle="${loc}" key="locale.enter.login" var="login_message" />
 <fmt:message bundle="${loc}" key="locale.enter.password" var="password_message" />
@@ -31,7 +31,7 @@
 		<label for="dropBoxTherapists">Therapist: </label>
 		<select id="therapistDb" name="dropBoxTherapists" class="selectpicker">
 				<option value="defOpt" disabled selected value> -- select an option -- </option>
-	  			<c:forEach var="therapists" items="${sessionScope.therapists}">
+	  			<c:forEach var="therapists" items="${therapists}">
 	  				<option value="<c:out value="${therapists.userType}" /> <c:out value="${therapists.userId}" /> <c:out value="${therapists.firstName}" /> <c:out value="${therapists.lastName}" />"><c:out value="${therapists.userType}" /> <c:out value="${therapists.firstName}" /> <c:out value="${therapists.lastName}" /></option>
 				</c:forEach>
 		</select></br>${login_message}:<br />
@@ -42,7 +42,7 @@
 		<input class="reg-buttons" type="submit" onclick="backToMain();" id="backToMainPageButton" name="backToMainPageButton" value="${back_message}" /><br />
 		<input type="hidden" id="requestParameter" name="requestParameter" value="-1">
 		<input type="hidden" id="therapistParameter" name="therapistParameter" value="-1">
-		<c:set var = "answer" scope = "session" value = "${sessionScope.answer}"/>
+		<c:set var = "answer" scope = "session" value = "${answer}"/>
 	<c:if test = "${answer != null}">
          <h3><c:out value="${answer}" /></h3>
     </c:if>

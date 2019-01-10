@@ -12,7 +12,7 @@ public class BackToWelcomePage implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		RequestDispatcher rd = request.getRequestDispatcher(Command.mainPageJSP);
-		request.getSession(true).setAttribute(Command.answerAttribute, null);
+		request.setAttribute(Command.answerAttribute, null);
 		try {
 			rd.forward(request, response);
 		} catch (ServletException e) {

@@ -16,7 +16,7 @@ function backToMain() {
 	document.getElementById('requestParameter').value = "BACK_TO_WELCOME_PAGE";
 }
 
-function makeAppointment() {
+function makeAppointment(currentUserId) {
 	var selectedTreatment;
 	if (selectedRb === "procedureRb") {
 		selectedTreatment = selectedProcedure;
@@ -30,6 +30,7 @@ function makeAppointment() {
 		url : 'appoint',
 		method : 'POST',
 		data : {
+			doctorId : currentUserId,
 			patientId : patientId,
 			executorId : executorId,
 			selectedTreatmentType : selectedRb,
@@ -286,4 +287,12 @@ if (medicineDb != null) {
 	medicineDb.onchange = function() {
 		selectedMedicine = this.value
 	}
+}
+
+function closeProfileForm() {
+	document.getElementById("ProfileInfo").style.display = "none";
+}
+
+function userProfileInfo(){
+	document.getElementById("ProfileInfo").style.display = "block";
 }

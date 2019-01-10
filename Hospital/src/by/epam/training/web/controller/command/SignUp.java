@@ -20,7 +20,7 @@ public class SignUp implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		RequestDispatcher rd = request.getRequestDispatcher(Command.signUpPageJSP);
-		request.getSession(true).setAttribute(Command.answerAttribute, null);
+		request.setAttribute(Command.answerAttribute, null);
 		try {
 			request.getSession(true).setAttribute("local", request.getAttribute("local"));
 			request.getSession(true).setAttribute("therapists", ServiceFactory.getInstance().getClientService().getTherapists());
