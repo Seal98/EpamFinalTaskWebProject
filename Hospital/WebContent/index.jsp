@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>MyJSP</title>
-<fmt:setLocale value="${requestScope.locale}"/>
+<fmt:setLocale value="${sessionScope.locale}"/>
 <fmt:setBundle basename="localization.locale" var="loc" />
 <fmt:message bundle="${loc}" key="locale.enter.login" var="login_message" />
 <fmt:message bundle="${loc}" key="locale.enter.password" var="password_message" />
@@ -28,8 +28,8 @@
 		<input type="text" name="login" value="" /><br /> ${password_message}:<br />
 		<input type="password" name="password" value="" /><br />
 		<div>
-		<input class="auth-buttons" type="submit" name="signInButton" onclick="signIn();" value="${sign_in_message}" /><br />
-		<input class="auth-buttons" type="submit" name="signUpButton" onclick="signUp();" value="${sign_up_message}" /><br />
+		<input class="reg-buttons" type="submit" name="signInButton" onclick="signIn();" value="${sign_in_message}" /><br />
+		<input class="reg-buttons" type="submit" name="signUpButton" onclick="signUp();" value="${sign_up_message}" /><br />
 		</div>
 		<input type="hidden" id="requestParameter" name="requestParameter" value="-1">
 	<c:set var = "answer" scope = "session" value = "${answer}"/>
@@ -37,8 +37,11 @@
          <h3><c:out value="${answer}" /></h3>
     </c:if>
     </div>
-		<input class="locale-buttons" type="submit" onclick="setLocaleRu();"  name="setRULocale" value="${locale_ru}" /><br />
-		<input class="locale-buttons" type="submit" onclick="setLocaleEn();"  name="setENLocale" value="${locale_en}" /><br />
-    	</form>
+		</form>
+	<form action="userAction" method="post">
+	<input type="hidden" id="localeRequestParameter" name="requestParameter" value="-1">	
+	<input class="header-buttons" type="submit" onclick="setLocaleRu();"  name="setRULocale" value="${locale_ru}" /><br />
+	<input class="header-buttons" type="submit" onclick="setLocaleEn();"  name="setENLocale" value="${locale_en}" /><br />
+	</form>
 </body>
 </html>

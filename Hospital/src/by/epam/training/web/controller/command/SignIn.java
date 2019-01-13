@@ -26,18 +26,22 @@ public class SignIn implements Command {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		request.setAttribute(Command.answerAttribute, null);
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 		ClientService clientService = serviceFactory.getClientService();
 		String login = request.getParameter(Command.loginParameter);
 		String password = request.getParameter(Command.passwordParameter);
+		if(login == null) {
+			login = request.getSession(true).getAttribute(Command.loginParameter).toString();
+			password = request.getSession(true).getAttribute(Command.passwordParameter).toString();
+		}
 		RequestDispatcher rd = null;
 		try {
 			User existingUser = clientService.signIn(login, password);
 			request.getSession(true).setAttribute(Command.currentUser, existingUser);
 			String userType = existingUser.getClass().getSimpleName();
 			request.setAttribute(Command.userType, userType);
-			request.setAttribute(Command.loginParameter, existingUser.getUserLogin());
+			request.getSession(true).setAttribute(Command.loginParameter, existingUser.getUserLogin());
+			request.getSession(true).setAttribute(Command.passwordParameter, existingUser.getUserPassword());
 			request.getSession(true).setAttribute(Command.idParameter, existingUser.getUserId());
 
 			if (userType.toUpperCase().compareTo(Command.patientUpperCase) == 0) {
@@ -45,6 +49,7 @@ public class SignIn implements Command {
 				request.setAttribute(appointments, curingInfo.getAppointments());
 				linkAttendedDoctorInfo(request, curingInfo.getAttendedDoctor());
 				rd = request.getRequestDispatcher(patientPageJSP);
+				request.getSession(true).setAttribute("currentPage", Command.patientPageJSP);
 			} else if (userType.toUpperCase().compareTo(Command.doctorUpperCase) == 0) {
 				if(((Doctor)existingUser).getSpecialization().toUpperCase().compareTo(Command.therapistUpperCase) == 0) {
 					request.setAttribute(Command.attendedPatients, clientService.getAttendedPatients(existingUser.getUserId()));
@@ -55,16 +60,20 @@ public class SignIn implements Command {
 					request.setAttribute(Command.surgeries, clientService.getSurgeries(treatment));
 					request.setAttribute(Command.appointments, clientService.getMadeAppointments(existingUser.getUserId()));
 					rd = request.getRequestDispatcher(Command.therapistPageJSP);
+					request.getSession(true).setAttribute("currentPage", Command.therapistPageJSP);
 				} else {
 					List<Appointment> appointments = clientService.getExecutorAppointments(existingUser.getUserId(), existingUser.getUserType());
 					request.setAttribute(Command.appointments, appointments);
 					rd = request.getRequestDispatcher(Command.executorPageJSP);
+					request.getSession(true).setAttribute("currentPage", Command.executorPageJSP);
 				}
 			} else if(userType.toUpperCase().compareTo(Command.nurseUpperCase) == 0) {
 				request.setAttribute(Command.appointments, clientService.getExecutorAppointments(existingUser.getUserId(), existingUser.getUserType()));
 				rd = request.getRequestDispatcher(Command.executorPageJSP);
+				request.getSession(true).setAttribute("currentPage", Command.executorPageJSP);
 			} else {
 				rd = request.getRequestDispatcher(Command.welcomePageJSP);
+				request.getSession(true).setAttribute("currentPage", Command.welcomePageJSP);
 			}
 
 			rd.forward(request, response);

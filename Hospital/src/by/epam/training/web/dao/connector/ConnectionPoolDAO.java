@@ -40,7 +40,7 @@ public class ConnectionPoolDAO {
     }
     
     public Connection getConnection() throws SQLException, InterruptedException {
-        if(connections.isEmpty()) {
+        while(connections.isEmpty()) {
         	Thread.sleep(50);
         }
         return connections.poll();

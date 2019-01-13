@@ -62,6 +62,10 @@
     <url-pattern>/createUser</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>WebAppServlet</servlet-name>
+    <url-pattern>/userAction</url-pattern>
+  </servlet-mapping> 
+  <servlet-mapping>
     <servlet-name>SignUpPage</servlet-name>
     <url-pattern>/signUp</url-pattern>
   </servlet-mapping>

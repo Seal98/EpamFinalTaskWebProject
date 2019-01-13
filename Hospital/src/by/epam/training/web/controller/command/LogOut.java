@@ -12,6 +12,7 @@ public class LogOut implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		RequestDispatcher rd = request.getRequestDispatcher(Command.mainPageJSP);
+		request.getSession(true).setAttribute("currentPage", "index.jsp");
 		try {
 			rd.forward(request, response);
 		} catch (ServletException e) {

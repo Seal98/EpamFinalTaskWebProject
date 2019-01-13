@@ -16,7 +16,7 @@ function backToMain() {
 	document.getElementById('requestParameter').value = "BACK_TO_WELCOME_PAGE";
 }
 
-function makeAppointment(currentUserId) {
+function makeAppointment(currentUserId, buttonCancelName, buttonCanceledName) {
 	var selectedTreatment;
 	if (selectedRb === "procedureRb") {
 		selectedTreatment = selectedProcedure;
@@ -55,20 +55,15 @@ function makeAppointment(currentUserId) {
 				divTreatmentStatus.className = 'divTableCell';
 				divTreatmentStatus.id = 'statusCell' + responseText;
 				var divCancelButtonCell = document.createElement('div');
-				// class="reg-buttons" type="submit"
-				// onclick="cancelAppointmen(this,
-				// <c:out value="${apps.appointmentId}" />);"
-				// id="cancelButton<c:out value="${apps.appointmentId}" />"
-				// value="Cancel" />
 				divCancelButtonCell.className = 'divTableCell';
 				var cancelButton = document.createElement('input');
 				cancelButton.className = 'reg-buttons';
 				cancelButton.type = 'submit';
 				cancelButton.onclick = function() {
-					cancelAppointment(this, this.id.split('cancelButton')[1]);
+					cancelAppointment(this, this.id.split('cancelButton')[1], buttonCanceledName);
 				};
 				cancelButton.id = 'cancelButton' + responseText;
-				cancelButton.value = 'Cancel';
+				cancelButton.value = buttonCancelName;
 
 				divCancelButtonCell.appendChild(cancelButton);
 				var fn = document.getElementById("p"
@@ -122,7 +117,7 @@ function userLogOut() {
 	document.getElementById('requestParameter').value = "LOG_OUT";
 }
 
-function completeAppointment(clickedButton, appointmentId) {
+function completeAppointment(clickedButton, appointmentId, completedButtonName) {
 	$.ajax({
 		url : 'completeAppointment',
 		method : 'POST',
@@ -132,7 +127,7 @@ function completeAppointment(clickedButton, appointmentId) {
 		},
 		success : function(responseText) {
 			if (responseText === "success") {
-				clickedButton.value = "Completed";
+				clickedButton.value = completedButtonName;
 				$(clickedButton).css('background-color', '#86E49C');
 				document.getElementById("status" + appointmentId).innerHTML = "completed";
 				clickedButton.disabled = true;
@@ -194,7 +189,7 @@ function dischargePatient() {
 	closeDischargeForm();
 }
 
-function cancelAppointment(cancelButton, appId) {
+function cancelAppointment(cancelButton, appId, canceledButtonName) {
 	$.ajax({
 		url : 'cancelAppointment',
 		method : 'POST',
@@ -204,7 +199,7 @@ function cancelAppointment(cancelButton, appId) {
 		},
 		success : function(responseText) {
 			if (responseText == "success") {
-				cancelButton.value = 'Canceled';
+				cancelButton.value = canceledButtonName;
 				$(cancelButton).css('background-color', '#86E49C');
 				document.getElementById("statusCell" + appId).innerHTML = "canceled";
 				cancelButton.disabled = true;

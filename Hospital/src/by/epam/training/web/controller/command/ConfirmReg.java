@@ -35,6 +35,7 @@ public class ConfirmReg implements Command {
 			//dispatcher = request.getRequestDispatcher(Command.mainPageJSP);
 			request.getSession(true).setAttribute(Command.answerAttribute, Command.registrationConfirmedMessage);
 			response.sendRedirect(Command.mainPageJSP);
+			request.getSession(true).setAttribute("currentPage", Command.mainPageJSP);
 		} catch (ServiceException se) {
 			dispatcher = request.getRequestDispatcher(Command.signUpPageJSP);
 			request.getSession(true).setAttribute(Command.answerAttribute, se.getMessage());

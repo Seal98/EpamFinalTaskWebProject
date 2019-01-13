@@ -1,11 +1,48 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
+<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setBundle basename="localization.locale" var="loc" />
+<fmt:message bundle="${loc}" key="locale.locale.button.ru" var="locale_ru" />
+<fmt:message bundle="${loc}" key="locale.locale.button.en" var="locale_en" />
+<fmt:message bundle="${loc}" key="locale.attention.patients" var="attendedPatients" />
+<fmt:message bundle="${loc}" key="locale.attention.patient.fname" var="firstName" />
+<fmt:message bundle="${loc}" key="locale.attention.patient.lname" var="lastName" />
+<fmt:message bundle="${loc}" key="locale.attention.patient.birthday" var="birthDate" />
+<fmt:message bundle="${loc}" key="locale.attention.patient.admissiondate" var="admissionDate" />
+<fmt:message bundle="${loc}" key="locale.attention.patients.discharged" var="dischargedPatients" />
+<fmt:message bundle="${loc}" key="locale.attention.patient.dischargedate" var="dischargeDate" />
+<fmt:message bundle="${loc}" key="locale.attention.patient.diagnosis" var="diagnosis" />
+<fmt:message bundle="${loc}" key="locale.attention.patient.diagnosis.final" var="finalDiagnosis" />
+<fmt:message bundle="${loc}" key="locale.appointmemts" var="madeAppointments" />
+<fmt:message bundle="${loc}" key="locale.appointment.patient" var="patient" />
+<fmt:message bundle="${loc}" key="locale.appointment.executor" var="executor" />
+<fmt:message bundle="${loc}" key="locale.appointment.treatment.type" var="treatmentType" />
+<fmt:message bundle="${loc}" key="locale.appointment.treatment" var="treatment" />
+<fmt:message bundle="${loc}" key="locale.appointment.status" var="status" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment" var="appointment" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.procedure" var="procedure" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.surgery" var="surgery" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.medicine" var="medicine" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.chosen.procedures" var="chosenProcedures" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.chosen.medicine" var="chosenMedicine" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.chosen.surgeries" var="chosenSurgeries" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.button.appoint" var="appointButton" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.button.discharge" var="dischargeButton" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.button.back" var="backButton" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.button.cancel" var="cancelButton" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.button.canceled" var="canceledButton" />
+<fmt:message bundle="${loc}" key="locale.creator.appointment.button.completed" var="completedButton" />
+<fmt:message bundle="${loc}" key="locale.attention.patient.discharge.form" var="dischargeForm" />
+<fmt:message bundle="${loc}" key="locale.user.profile" var="userProfile" />
+<fmt:message bundle="${loc}" key="locale.user.logout" var="userLogOut" />
+<fmt:message bundle="${loc}" key="locale.user.experience" var="experience" />
+<fmt:message bundle="${loc}" key="locale.user.specialization" var="specialization" />
+<fmt:message bundle="${loc}" key="locale.user.type" var="userType" />
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <link href="css/style.css" rel='stylesheet' type='text/css'>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -14,24 +51,50 @@
 
 </head>
 <body>
-	<form action="createUser" method="post">
-		<input class="reg-buttons" type="submit" style="float: left;" onclick="userLogOut();" id="backToMainPageButton"
-			name="backToMainPageButton" value="Log out" /> <input
-			type="hidden" id="requestParameter" name="requestParameter"
-			value="-1">
+<div class="hospital-header">
+<img src="http://www.pngall.com/wp-content/uploads/2016/06/Doctor-Symbol-Caduceus-PNG-Clipart.png" width="10%" height="100%">
+	<form action="userAction" style="float: right;" method="post">
+	<input type="hidden" id="requestParameter" name="requestParameter" value="-1">
+	<input class="header-buttons" type="submit" onclick="userLogOut();" id="backToMainPageButton"
+			name="backToMainPageButton" value="${userLogOut}" />
 	</form>
-		<input class="reg-buttons" type="submit" onclick="userProfileInfo();" id="profileInfoButton"
-			name="profileInfoButton" value="Profile info" /><br />
-			
+	<input class="header-buttons" type="submit" style="float: right;" onclick="userProfileInfo();" id="profileInfoButton"
+			name="profileInfoButton" value="${userProfile}" /><br />
+</div>
+<div class="form-popup" id="ProfileInfo">
+  	<div class="form-container">
+    <h1>${userProfile}</h1>
+      <label><b>${userType}:</b> <c:out value="${current_user.userType}" /></label><br>
+      <label><b>${firstName}:</b> <c:out value="${current_user.firstName}" /></label><br> 
+      <label><b>${lastName}:</b> <c:out value="${current_user.lastName}" /></label><br>
+      <c:if test="${current_user.userType.toUpperCase().compareTo('DOCTOR') == 0}">   
+      <label><b>${specialization}:</b> <c:out value="${current_user.specialization}" /></label><br> 
+      <label><b>${experience}:</b> <c:out value="${current_user.experience}" /></label><br> 
+      </c:if>  
+      <c:if test="${current_user.userType.toUpperCase().compareTo('NURSE') == 0}">
+      <label><b>${experience}:</b> <c:out value="${current_user.experience}" /></label><br> 
+      </c:if>  
+      <c:if test="${current_user.userType.toUpperCase().compareTo('PATIENT') == 0}">   
+      <label><b>${admissionDate}:</b> <c:out value="${current_user.admissionDate}" /></label><br> 
+      <label><b>${appointor}:</b> <c:out value="${requestScope.attended_doctor_fname}" /> <c:out value="${requestScope.attended_doctor_lname}" /></label><br> 
+       </c:if>	
+	<form action="userAction" method="post">
+	<input type="hidden" id="localeRequestParameter" name="requestParameter" value="-1">
+    <input class="reg-buttons" type="submit" onclick="setLocaleRu();"  name="setRULocale" value="${locale_ru}" /><br />
+	<input class="reg-buttons" type="submit" onclick="setLocaleEn();"  name="setENLocale" value="${locale_en}" /><br />
+  	</form>
+    <button type="button" class="btn cancel" onclick="closeProfileForm();">${backButton}</button>
+  </div>
+</div><br>
 	<div style="width: 100%;">
-		<div class="tableNameFont">Attended patients:</div>
+		<div class="tableNameFont">${attendedPatients}:</div>
 		<div class="divTable greenTable">
 			<div class="divTableHeading">
 				<div class="divTableRow">
-					<div class="divTableHead">First name</div>
-					<div class="divTableHead">Last name</div>
-					<div class="divTableHead">Birthdate</div>
-					<div class="divTableHead">Admission date</div>
+					<div class="divTableHead">${firstName}</div>
+					<div class="divTableHead">${lastName}</div>
+					<div class="divTableHead">${birthDate}</div>
+					<div class="divTableHead">${admissionDate}</div>
 				</div>
 			</div>
 			<div class="divTableBody">
@@ -43,10 +106,10 @@
 						<div class="divTableCell" id="p<c:out value="${patients.userId}" />bd"><c:out value="${patients.birthDate}" /></div>
 						<div class="divTableCell" id="p<c:out value="${patients.userId}" />ad"><c:out value="${patients.admissionDate}" /></div>
 						<div class="divTableCell">
-						<input class="reg-buttons" type="submit" onclick="openForm(this);" id="appointment<c:out value="${patients.userId}" />" name="appointmentButton" value="Appoint" /><br />
+						<input class="reg-buttons" type="submit" onclick="openForm(this);" id="appointment<c:out value="${patients.userId}" />" name="appointmentButton" value="<c:out value="${appointButton}" />" /><br />
 						</div>
 						<div class="divTableCell">
-						<input class="reg-buttons" type="submit" onclick="openDischargeForm(this);" id="discharge<c:out value="${patients.userId}" />" name="dischargeButton" value="Discharge" /><br />
+						<input class="reg-buttons" type="submit" onclick="openDischargeForm(this);" id="discharge<c:out value="${patients.userId}" />" name="dischargeButton" value="<c:out value="${dischargeButton}" />" /><br />
 						</div>
 					</div>
 				</c:if>
@@ -55,17 +118,17 @@
 		</div>
 	</div><br>
 	<div style="width: 100%;">
-		<div class="tableNameFont">Discharged patients:</div>
+		<div class="tableNameFont">${dischargedPatients}:</div>
 		<div class="divTable greenTable">
 			<div class="divTableHeading">
 				<div class="divTableRow">
-					<div class="divTableHead">First name</div>
-					<div class="divTableHead">Last name</div>
-					<div class="divTableHead">Birthdate</div>
-					<div class="divTableHead">Admission date</div>
-					<div class="divTableHead">Discharge date</div>
-					<div class="divTableHead">Diagnosis</div>
-					<div class="divTableHead">Final diagnosis</div>															
+					<div class="divTableHead">${firstName}</div>
+					<div class="divTableHead">${lastName}</div>
+					<div class="divTableHead">${birthDate}</div>
+					<div class="divTableHead">${admissionDate}</div>
+					<div class="divTableHead">${dischargeDate}</div>
+					<div class="divTableHead">${diagnosis}</div>
+					<div class="divTableHead">${finalDiagnosis}</div>															
 				</div>
 			</div>
 			<div class="divTableBody" id="dischargedPatientsTable">
@@ -87,15 +150,15 @@
 	</div>	
 	<br>
 	<div style="width: 100%;">
-		<div class="tableNameFont">Made appointments:</div>
+		<div class="tableNameFont">${madeAppointments}:</div>
 		<div class="divTable greenTable">
 			<div class="divTableHeading">
 				<div class="divTableRow">
-					<div class="divTableHead">Patient</div>
-					<div class="divTableHead">Executor</div>
-					<div class="divTableHead">Treatment type</div>
-					<div class="divTableHead">Treatment</div>
-					<div class="divTableHead">Status</div>
+					<div class="divTableHead">${patient}</div>
+					<div class="divTableHead">${executor}</div>
+					<div class="divTableHead">${treatmentType}</div>
+					<div class="divTableHead">${treatment}</div>
+					<div class="divTableHead">${status}</div>
 				</div>
 			</div>
 			<div id="therapistAppointments" class="divTableBody">
@@ -118,13 +181,13 @@
 						</div>
 						<div class="divTableCell">
 						<c:if test="${apps.completionStatus.compareTo('not completed') == 0}">
-							<input class="reg-buttons" type="submit" onclick="cancelAppointment(this, <c:out value="${apps.appointmentId}" />);" id="cancelButton<c:out value="${apps.appointmentId}" />" value="Cancel" /><br />
+							<input class="reg-buttons" type="submit" onclick="cancelAppointment(this, <c:out value="${apps.appointmentId}" />, '<c:out value="${canceledButton}" />');" id="cancelButton<c:out value="${apps.appointmentId}" />" value="<c:out value="${cancelButton}" />" /><br />
 						</c:if>
 						<c:if test="${apps.completionStatus.compareTo('completed') == 0}">
-  							<input class="reg-buttons" style="background-color: #86E49C" type="submit" value="Completed" disabled/><br />
+  							<input class="reg-buttons" style="background-color: #86E49C" type="submit" value="<c:out value="${completedButton}" />" disabled/><br />
 						</c:if>
 						<c:if test="${apps.completionStatus.compareTo('canceled') == 0}">
-  							<input class="reg-buttons" style="background-color: #86E49C" type="submit" value="Canceled" disabled/><br />
+  							<input class="reg-buttons" style="background-color: #86E49C" type="submit" value="<c:out value="${canceledButton}" />" disabled/><br />
 						</c:if>	
 						</div>				
 					</div>
@@ -134,8 +197,8 @@
 	</div>	
 	<div class="form-popup" id="myForm">
   	<form class="form-container">
-    <h1>Appointment</h1>
-    <label for="dropBoxExecutor"><b>Executor:  </b></label>
+    <h1>${appointment}</h1>
+    <label for="dropBoxExecutor"><b>${executor}:  </b></label>
 		<select id="executorDb" name="dropBoxExecutor" class="selectpicker">
 		<option value="defOpt" disabled selected value> -- select an option -- </option>
 	  			<c:forEach var="executors" items="${requestScope.executors}">
@@ -144,68 +207,47 @@
 		</select></br>
 
 	  <input type="radio" id="procedureRb" name="treatmentRbs" onclick="handleTreatmentRb(this);" value="procedureRb" disabled>
-  	  <label for="procedureRb">Procedure </label>
+  	  <label for="procedureRb">${procedure} </label>
 	  <input type="radio" id="surgeryRb" name="treatmentRbs" onclick="handleTreatmentRb(this);" value="surgeryRb" disabled>
-  	  <label for="surgeryRb">Surgery </label>
+  	  <label for="surgeryRb">${surgery} </label>
 	  <input type="radio" id="medicineRb" name="treatmentRbs" onclick="handleTreatmentRb(this);" value="medicineRb" disabled>
-  	  <label for="medicineRb">Medicine </label>
+  	  <label for="medicineRb">${medicine} </label>
 
-		<label id="medicineLabel" for="dropBoxMedicine" style="display: none;"><b>Medicine:  </b></label>
+		<label id="medicineLabel" for="dropBoxMedicine" style="display: none;"><b>${chosenMedicine}:  </b></label>
 		<select id="medicineDb" name="dropBoxMedicine" class="selectpicker" style="display: none;">
 		<option value="defOpt" disabled selected value> -- select an option -- </option>		
 	  		<c:forEach var="medicine" items="${requestScope.medicine}">
 	  			<option><c:out value="${medicine.name}" /></option>
 			</c:forEach>
 		</select></br>
-		<label id="proceduresLabel" for="dropBoxProcedures" style="display: none;"><b>Procedures:  </b></label>
+		<label id="proceduresLabel" for="dropBoxProcedures" style="display: none;"><b>${chosenProcedures}:  </b></label>
 		<select id="proceduresDb" name="dropBoxProcedures" class="selectpicker" style="display: none;">
 		<option value="defOpt" disabled selected value> -- select an option -- </option>		
 	  		<c:forEach var="procedures" items="${requestScope.procedures}">
 	  			<option><c:out value="${procedures.name}" /></option>
 			</c:forEach>
 		</select></br>		
-		<label id="surgeriesLabel" for="dropBoxSurgeries" style="display: none;"><b>Surgeries:  </b></label>
+		<label id="surgeriesLabel" for="dropBoxSurgeries" style="display: none;"><b>${chosenSurgeries}:  </b></label>
 		<select id="surgeriesDb" name="dropBoxSurgeries" class="selectpicker" style="display: none;">
 		<option value="defOpt" disabled selected value> -- select an option -- </option>		
 	  		<c:forEach var="surgeries" items="${requestScope.surgeries}">
 	  			<option><c:out value="${surgeries.name}" /></option>
 			</c:forEach>
 		</select></br>		
-    <button type="button" class="btn" onclick="makeAppointment(<c:out value="${current_user.userId}" />);">Appoint</button>
-    <button type="button" class="btn cancel" onclick="closeForm();">Close</button>
+    <button type="button" class="btn" onclick="makeAppointment(<c:out value="${current_user.userId}" />, '<c:out value="${cancelButton}"/>', '<c:out value="${canceledButton}"/>');">${appointButton}</button>
+    <button type="button" class="btn cancel" onclick="closeForm();">${backButton}</button>
   </form>
 </div>
 
 <div class="form-popup" id="myDischargeForm">
   	<form class="form-container">
-    <h1>Discharge form</h1>
-      <label for="diagnosisInput">Diagnosis</label>
+    <h1>${dischargeForm}</h1>
+      <label for="diagnosisInput"><b>${diagnosis}</b></label>
 	  <input type="text" id="diagnosis" name="diagnosisInput">
-  	  <label for="finalDiagnosisInput">Final diagnosis</label>
+  	  <label for="finalDiagnosisInput"><b>${finalDiagnosis}</b></label>
 	  <input type="text" id="finalDiagnosis" name="finalDiagnosisInput">
-    <button type="button" class="btn" onclick="dischargePatient();">Discharge</button>
-    <button type="button" class="btn cancel" onclick="closeDischargeForm();">Close</button>
-  </form>
-</div>
-
-<div class="form-popup" id="ProfileInfo">
-  	<form class="form-container">
-    <h1>Profile info</h1>
-      <label><b>Type:</b> <c:out value="${current_user.userType}" /></label><br>
-      <label><b>First name:</b> <c:out value="${current_user.firstName}" /></label><br> 
-      <label><b>Last name:</b> <c:out value="${current_user.lastName}" /></label><br>
-      <c:if test="${current_user.userType.toUpperCase().compareTo('DOCTOR') == 0}">   
-      <label><b>Specialization:</b> <c:out value="${current_user.specialization}" /></label><br> 
-      <label><b>Experience:</b> <c:out value="${current_user.experience}" /></label><br> 
-      </c:if>  
-      <c:if test="${current_user.userType.toUpperCase().compareTo('NURSE') == 0}">
-      <label><b>Experience:</b> <c:out value="${current_user.experience}" /></label><br> 
-      </c:if>  
-      <c:if test="${current_user.userType.toUpperCase().compareTo('PATIENT') == 0}">   
-      <label><b>Admission date:</b> <c:out value="${current_user.admissionDate}" /></label><br> 
-      <label><b>Attended doctor:</b> <c:out value="${current_user.attended_doctor_fname}" /> <c:out value="${current_user.attended_doctor_fname}" /></label><br> 
-      </c:if>
-    <button type="button" class="btn cancel" onclick="closeProfileForm();">Close</button>
+    <button type="button" class="btn" onclick="dischargePatient();">${dischargeButton}</button>
+    <button type="button" class="btn cancel" onclick="closeDischargeForm();">${backButton}</button>
   </form>
 </div>
 
@@ -213,5 +255,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-1.10.2.js" type="text/javascript"></script>
 <script src="js/script.js"></script>
+<script src="js/scriptLocale.js"></script>
 </body>
 </html>

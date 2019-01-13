@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
-<fmt:setLocale value="${locale}"/>
+<fmt:setLocale value="${sessionScope.locale}"/>
 <fmt:setBundle basename="localization.locale" var="loc" />
 <fmt:message bundle="${loc}" key="locale.enter.login" var="login_message" />
 <fmt:message bundle="${loc}" key="locale.enter.password" var="password_message" />
@@ -47,8 +47,11 @@
          <h3><c:out value="${answer}" /></h3>
     </c:if>
 </div>	
-		<input class="locale-buttons" type="submit" onclick="setLocaleRu();" name="setRULocale" value="${locale_ru}" /><br />
-		<input class="locale-buttons" type="submit" onclick="setLocaleEn();" name="setENLocale" value="${locale_en}" /><br />
+	</form>
+	<form action="userAction" method="post">
+	<input type="hidden" id="localeRequestParameter" name="requestParameter" value="-1">	
+	<input class="header-buttons" type="submit" onclick="setLocaleRu();"  name="setRULocale" value="${locale_ru}" /><br />
+	<input class="header-buttons" type="submit" onclick="setLocaleEn();"  name="setENLocale" value="${locale_en}" /><br />
 	</form>
 	<script src="js/script.js"></script>
 	<script src="js/scriptLocale.js"></script>

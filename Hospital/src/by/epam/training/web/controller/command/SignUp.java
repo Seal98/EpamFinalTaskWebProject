@@ -22,8 +22,8 @@ public class SignUp implements Command {
 		RequestDispatcher rd = request.getRequestDispatcher(Command.signUpPageJSP);
 		request.setAttribute(Command.answerAttribute, null);
 		try {
-			request.getSession(true).setAttribute("local", request.getAttribute("local"));
 			request.getSession(true).setAttribute("therapists", ServiceFactory.getInstance().getClientService().getTherapists());
+			request.getSession(true).setAttribute("currentPage", Command.signUpPageJSP);
 			rd.forward(request, response);
 		} catch (ServletException e) {
 			logger.info(e);

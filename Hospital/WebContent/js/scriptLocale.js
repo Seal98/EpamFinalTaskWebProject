@@ -1,7 +1,7 @@
 function setLocaleEn(){
-	document.getElementById('requestParameter').value = "en";
+	document.getElementById('localeRequestParameter').value = "en";
 }
 
 function setLocaleRu(){
-	document.getElementById('requestParameter').value = "ru";
+	document.getElementById('localeRequestParameter').value = "ru";
 }

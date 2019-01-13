@@ -837,7 +837,9 @@ public class SQLUserDAO implements UserDAO {
 		Connection connection = null;
 		Statement activeStmt = null;
 		try {
+			System.out.println("Here");
 			connection = connectionPool.getConnection();
+			System.out.println(connection);
 			activeStmt = connection.createStatement();
 			loadDoctors(activeStmt, connection);
 			loadNurses(activeStmt, connection);
