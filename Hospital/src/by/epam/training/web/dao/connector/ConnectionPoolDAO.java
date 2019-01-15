@@ -3,6 +3,7 @@ package by.epam.training.web.dao.connector;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ResourceBundle;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -14,16 +15,20 @@ public class ConnectionPoolDAO {
 	private String urlDB;
 	private String userDB;
 	private String passwordDB;
-	private BlockingQueue<Connection> connections = new LinkedBlockingQueue<Connection>(20);
+	private String driverName;
+	private BlockingQueue<Connection> connections;
 
     private static Logger logger = LogManager.getLogger(ConnectionPoolDAO.class);
-	public static final String driverName = "com.mysql.jdbc.Driver";
 	
-    public ConnectionPoolDAO(String urlDB, String userDB, String passwordDB) {
-    	this.urlDB = urlDB;
-    	this.userDB = userDB;
-    	this.passwordDB = passwordDB;
-    	createConnections(20);
+    public ConnectionPoolDAO() {
+    	DBResourceManager dbResourceManager = DBResourceManager.getInstance();
+    	int pollNumber = Integer.parseInt(dbResourceManager.getValue(DBParameter.DB_POLL_SIZE));
+    	this.connections = new LinkedBlockingQueue<Connection>(pollNumber);
+    	this.driverName = dbResourceManager.getValue(DBParameter.DB_DRIVER);
+    	this.urlDB = dbResourceManager.getValue(DBParameter.DB_URL);
+    	this.userDB = dbResourceManager.getValue(DBParameter.DB_USER);
+    	this.passwordDB = dbResourceManager.getValue(DBParameter.DB_PASSWORD);
+    	createConnections(pollNumber);
     }
     
     private void createConnections(int connectionsNumber) {

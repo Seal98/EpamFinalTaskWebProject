@@ -33,8 +33,7 @@ import by.epam.training.web.exception.DAOException;
 
 public class SQLUserDAO implements UserDAO {
 
-	private static final ConnectionPoolDAO connectionPool = new ConnectionPoolDAO("jdbc:mysql://localhost:3306/webapp",
-			"root", "root");
+	private static final ConnectionPoolDAO connectionPool = new ConnectionPoolDAO();
 	private List<User> users = new LinkedList<>();
 	private List<MedicalTreatment> treatment = new LinkedList<>();
 	public static final String getAllUsersDBQuery = "SELECT * from users";
