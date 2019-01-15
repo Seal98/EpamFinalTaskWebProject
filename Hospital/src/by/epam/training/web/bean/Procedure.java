@@ -10,13 +10,13 @@ public class Procedure extends MedicalTreatment implements Serializable {
 	
 	public Procedure() {
 		super();
-		super.setType("procedure");
+		super.setType(MedicalTreatment.procedureConst);
 	}
 
 	public Procedure(String name, String description) {
 		this.description = description;
 		super.setName(name);
-		super.setType("procedure");
+		super.setType(MedicalTreatment.procedureConst);
 	}
 	
 	public String getDescription() {

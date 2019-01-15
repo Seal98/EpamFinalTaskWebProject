@@ -18,6 +18,7 @@
 <fmt:message bundle="${loc}" key="locale.back.to.main.page" var="back_message" />
 <fmt:message bundle="${loc}" key="locale.locale.button.ru" var="locale_ru" />
 <fmt:message bundle="${loc}" key="locale.locale.button.en" var="locale_en" />
+<fmt:message bundle="${loc}" key="locale.patient.appointor" var="therapist" />
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <link href="css/style.css" rel='stylesheet' type='text/css'>
 </head>
@@ -28,7 +29,7 @@
 		<input type="text" name="fname" value="" /><br /> ${last_name_message}: <br />
 		<input type="text" name="lname" value="" /><br /> ${birthdate_message}: <br />
 		<input type="date" name="bdate" value="" /><br /> 
-		<label for="dropBoxTherapists">Therapist: </label>
+		<label for="dropBoxTherapists">${therapist} : </label>
 		<select id="therapistDb" name="dropBoxTherapists" class="selectpicker">
 				<option value="defOpt" disabled selected value> -- select an option -- </option>
 	  			<c:forEach var="therapists" items="${therapists}">
@@ -42,7 +43,7 @@
 		<input class="reg-buttons" type="submit" onclick="backToMain();" id="backToMainPageButton" name="backToMainPageButton" value="${back_message}" /><br />
 		<input type="hidden" id="requestParameter" name="requestParameter" value="-1">
 		<input type="hidden" id="therapistParameter" name="therapistParameter" value="-1">
-		<c:set var = "answer" scope = "session" value = "${answer}"/>
+		<c:set var = "answer" value = "${regMistakeMessage}"/>
 	<c:if test = "${answer != null}">
          <h3><c:out value="${answer}" /></h3>
     </c:if>

@@ -45,7 +45,7 @@
 	<input class="header-buttons" type="submit" style="float: right;" onclick="userProfileInfo();" id="profileInfoButton"
 			name="profileInfoButton" value="${userProfile}" /><br />
 </div>
-<div class="form-popup" id="ProfileInfo">
+<div class="form-profile" id="ProfileInfo">
   	<div class="form-container">
     <h1>${userProfile}</h1>
       <label><b>${userType}:</b> <c:out value="${current_user.userType}" /></label><br>

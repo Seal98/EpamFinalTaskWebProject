@@ -32,7 +32,7 @@
 		<input class="reg-buttons" type="submit" name="signUpButton" onclick="signUp();" value="${sign_up_message}" /><br />
 		</div>
 		<input type="hidden" id="requestParameter" name="requestParameter" value="-1">
-	<c:set var = "answer" scope = "session" value = "${answer}"/>
+	<c:set var = "answer" value = "${answer}"/>
 	<c:if test = "${answer != null}">
          <h3><c:out value="${answer}" /></h3>
     </c:if>

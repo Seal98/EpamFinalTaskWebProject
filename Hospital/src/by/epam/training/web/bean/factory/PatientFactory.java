@@ -27,13 +27,14 @@ public class PatientFactory implements UserFactory {
 		int userId = usersSet.getInt(SQLUserDAO.loginDataIdConst);
 		String userLogin = loginSet.getString(SQLUserDAO.loginConst);
 		String userPassword = loginSet.getString(SQLUserDAO.passwordConst);
+		String language = loginSet.getString(SQLUserDAO.languageConst);
 		String userFirstName = usersSet.getString(SQLUserDAO.firstNameConst);
 		String userLastName = usersSet.getString(SQLUserDAO.lastNameConst);
 		Date birthdate = usersSet.getDate(SQLUserDAO.birthdateConst);
 		Date admissionDate = usersSet.getDate(SQLUserDAO.admissionDateConst);
 		int attendedDoctorId = usersSet.getInt(SQLUserDAO.attendedDoctorIdConst);
 		boolean dischargeStatus = usersSet.getBoolean(SQLUserDAO.dischargeStatusConst);
-		return new Patient(userId, userLogin, userPassword, userFirstName, userLastName, birthdate, admissionDate, attendedDoctorId, dischargeStatus);
+		return new Patient(userId, userLogin, userPassword, language, userFirstName, userLastName, User.formatter.format(birthdate), User.formatter.format(admissionDate), attendedDoctorId, dischargeStatus);
 	}
 
 }

@@ -10,7 +10,8 @@ public class WrongCommand implements Command{
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher("index.jsp").forward(request, response);
+		request.setAttribute(Command.answerAttribute, Command.wrongCommandMessage);
+		request.getRequestDispatcher(Command.mainPageJSP).forward(request, response);
 	}
 
 }

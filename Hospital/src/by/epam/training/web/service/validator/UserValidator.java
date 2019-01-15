@@ -13,7 +13,7 @@ public class UserValidator {
 
 	public static final int PASSWORD_MIN_LENGTH = 5;
 	public static final int PASSWORD_MAX_LENGTH = 15;
-
+	
 	public ValidatorResult userSignInDataValidator(String userLogin, String userPassword) {
 		ValidatorResult result = new ValidatorResult(true, ValidatorMessage.correctMessage);
 		userLoginValidator(userLogin, result);
@@ -25,7 +25,7 @@ public class UserValidator {
 	}
 
 	public ValidatorResult userSignUpDataValidator(String userLogin, String userPassword, String userConfirmedPassword,
-			String userFirstName, String userLastName, String therapistId) {
+			String userFirstName, String userLastName, String therapistId, String birthdate) {
 		ValidatorResult result = new ValidatorResult(true, ValidatorMessage.correctMessage);
 		userFirstNameValidator(userFirstName, result);
 		if (!result.isValid()) {
@@ -35,28 +35,47 @@ public class UserValidator {
 		if (!result.isValid()) {
 			return result;
 		}
-		userLoginValidator(userLogin, result);
+		birthdateValidator(result, birthdate);
 		if (!result.isValid()) {
 			return result;
 		}
-		userIdValidator(result, therapistId);
+		therapistValidator(result, therapistId);
 		if (!result.isValid()) {
 			return result;
-		}		
+		}			
+		userLoginValidator(userLogin, result);
+		if (!result.isValid()) {
+			return result;
+		}	
 		userPasswordValidator(userPassword, userConfirmedPassword, result);
 		return result;
 	}
 
-	private void userIdValidator(ValidatorResult result, String userId) {
-		System.out.println(userId);
-		if(userId == null || !userId.matches("[0-9]+")) {
+	public ValidatorResult validateLocale(String userLocale) {
+		ValidatorResult result = new ValidatorResult(true, ValidatorMessage.correctMessage);
+		if(userLocale == null || !userLocale.matches(ValidatorHelper.stringRegex)) {
 			result.setValid(false);
-			result.setValidationMessage(ValidatorMessage.invalidIdMessage);
+			result.setValidationMessage(ValidatorMessage.invalidLanguage);
 		}
+		return result;
 	}
 	
+	private void birthdateValidator(ValidatorResult result, String birthdate) {
+		if(birthdate == null || birthdate.isEmpty()) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.birthdateMessage);			
+		}
+	}		
+	
+	private void therapistValidator(ValidatorResult result, String userId) {
+		if(userId == null || !userId.matches(ValidatorHelper.numberRegex)) {
+			result.setValid(false);
+			result.setValidationMessage(ValidatorMessage.therapistMessage);			
+		}
+	}	
+	
 	public ValidatorResult validateDischargeInfo(String userId, String diagnosis, String finalDiagnosis) {
-		if(userId == null || !userId.matches("[0-9]+")) {
+		if(userId == null || !userId.matches(ValidatorHelper.numberRegex)) {
 			return new ValidatorResult(false, ValidatorMessage.invalidIdMessage);
 		}
 		if(diagnosis == null || diagnosis.isEmpty()) {

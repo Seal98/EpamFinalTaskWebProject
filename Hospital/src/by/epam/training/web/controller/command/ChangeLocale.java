@@ -7,27 +7,35 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.epam.training.web.exception.ServiceException;
+import by.epam.training.web.service.ServiceFactory;
 
 public class ChangeLocale implements Command {
 
+	private static Logger logger = LogManager.getLogger(ChangeLocale.class);
+
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		System.out.println("Here1");
-		request.getSession(true).setAttribute("locale", request.getParameter("requestParameter"));
-		Object localeAttribute = request.getSession(true).getAttribute("currentPage");
-		String currentPage = localeAttribute != null ? localeAttribute.toString() : "index.jsp";
-		System.out.println("Current page: " + currentPage);
-		if(currentPage.compareTo("index.jsp") == 0) {
-			response.sendRedirect("index.jsp");
-			System.out.println(1);
-		} else if(currentPage.compareTo("patientPage") == 0 || currentPage.compareTo("therapistPage") == 0 || currentPage.compareTo("executorPage") == 0) {
-			request.getSession(true).setAttribute("changeLocaleParameter", "SIGN_IN");
-			request.getRequestDispatcher("authorization").forward(request, response);
-			System.out.println(2);
-		} else if(currentPage.compareTo("signUp") == 0) {
-			response.sendRedirect("signUp");
-			System.out.println(3);
+		String locale = request.getParameter(Command.requestParameter);
+		request.getSession(true).setAttribute(Command.localeParameter, locale);
+		Object localeAttribute = request.getSession(true).getAttribute(Command.currentPageParameter);
+		String currentPage = localeAttribute != null ? localeAttribute.toString() : Command.mainPageJSP;
+		if (currentPage.compareTo(Command.mainPageJSP) == 0) {
+			response.sendRedirect(Command.mainPageJSP);
+		} else if (currentPage.compareTo(Command.signUpPageJSP) == 0) {
+			response.sendRedirect(Command.signUpPageJSP);
+		} else {
+			request.getSession(true).setAttribute(Command.changeLocaleParameter, Command.signInParameter);
+			try {
+				ServiceFactory.getInstance().getClientService().changeUserLocale(locale,
+						request.getSession(true).getAttribute(Command.idParameter).toString());
+			} catch (ServiceException e) {
+				logger.error(e);
+			}
+			request.getRequestDispatcher(Command.authorizationParameter).forward(request, response);
 		}
 
 	}

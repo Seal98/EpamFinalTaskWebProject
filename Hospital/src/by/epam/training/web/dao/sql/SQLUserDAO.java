@@ -44,7 +44,6 @@ public class SQLUserDAO implements UserDAO {
 	public static final String getMedicineQuert = "select * from medicine";
 	public static final String getProcedures = "select * from procedures";
 	public static final String getSurgeries = "select * from surgeries";
-	public static final String indicationsConst = "indications";
 	public static final String insertUserDBQuery = "INSERT into users(login, password) values(?, ?)";
 	public static final String getAttendedDoctor = "select * from doctors where id = (select attended_doctor_id from patients where login_data_id=?)";
 	public static final String getPatientAppointmentsNursesExecutors = "select a.id, a.appointed_doctor_id, a.procedures, a.medicine, a.surgery, a.completion_status, n.nurse_id from appointments a inner join nurses_executors n on n.appointment_id = a.id where patient_id = (select id from patients where login_data_id=?)";
@@ -54,38 +53,8 @@ public class SQLUserDAO implements UserDAO {
 	public static final String selectDoctorByIdQuery = "select * from doctors where login_data_id = ?";
 	public static final String getTherapistsDBQuery = "select u.id from users u inner join doctors d where u.id = d.login_data_id and d.speciality = 'therapist'";
 	public static final String getPatientByAttendedDoctorId = "select login_data_id from patients where attended_doctor_id = (select id from doctors where login_data_id = ?)";
-	public static final String userTypeDoctorUpperCase = "DOCTOR";
-	public static final String userTypeNurseUpperCase = "NURSE";
-	public static final String userTypePatientUpperCase = "PATIENT";
-	public static final String specializationTherapistUpperCase = "THERAPIST";
 	public static final String getDoctorIdInfoWithDoctorIdQuery = "select id from doctors where login_data_id=?";
 	public static final String getPatientIdInfoWithPatientIdQuery = "select id from patients where login_data_id=?";
-	public static final String loginDataIdConst = "login_data_id";
-	public static final String idConst = "id";
-	public static final String loginConst = "login";
-	public static final String passwordConst = "password";
-	public static final String typeConst = "type";
-	public static final String nameConst = "name";
-	public static final String firstNameConst = "first_name";
-	public static final String lastNameConst = "last_name";
-	public static final String birthdateConst = "birthdate";
-	public static final String specialityConst = "speciality";
-	public static final String experienceConst = "experience";
-	public static final String admissionDateConst = "admission_date";
-	public static final String attendedDoctorIdConst = "attended_doctor_id";
-	public static final String dischargeStatusConst = "discharge_status";
-	public static final String medicineUpperCaseConst = "MEDICINE";
-	public static final String procedureUpperCaseConst = "PROCEDURE";
-	public static final String surgeryUpperCaseConst = "SURGERY";
-	public static final String medicineConst = "medicine";
-	public static final String proceduresConst = "procedures";
-	public static final String surgeryConst = "surgery";
-	public static final String patientIdConst = "patient_id";
-	public static final String nurseIdConst = "nurse_id";
-	public static final String doctorIdConst = "doctor_id";
-	public static final String dischargeDateConst = "discharge_date";
-	public static final String diagnosisConst = "diagnosis";
-	public static final String appointedDoctorIdConst = "appointed_doctor_id";
 	public static final String therapistAppointmentsQueryInnerJoinPatients = "select ap.id, ap.executor_type, ap.procedures, ap.medicine, ap.surgery, ap.completion_status, p.login_data_id, p.discharge_status from appointments ap left join patients p on ap.patient_id=p.id where appointed_doctor_id=(select id from doctors where login_data_id=?)";
 	public static final String therapistAppointmentsQueryInnerJoinDoctorsExecutors = "select d.login_data_id from appointments ap inner join doctors_executors dex on ap.id=dex.appointment_id inner join doctors d on dex.doctor_id=d.id where ap.id=?";
 	public static final String therapistAppointmentsQueryInnerJoinNursesExecutors = "select n.login_data_id from appointments ap inner join nurses_executors nex on ap.id=nex.appointment_id inner join nurses n on nex.nurse_id=n.id where ap.id=?";
@@ -94,8 +63,6 @@ public class SQLUserDAO implements UserDAO {
 	public static final String getNurseIdInfoWithNurseIdQuery = "select id from nurses where login_data_id=?";
 	public static final String insertIntoNursesExecutorsUpdate = "insert into nurses_executors(appointment_id, nurse_id) values(?, ?)";
 	public static final String insertIntoDoctorsExecutorsUpdate = "insert into doctors_executors(appointment_id, doctor_id) values(?, ?)";
-	public static final String executorTypeConst = "executor_type";
-	public static final String completionStatusConst = "completion_status";
 	public static final String getAppointmentsQueryInnerJoinProcedures = "select p.name from appointments ap inner join appointed_procedures dep on ap.id=dep.appointment_id inner join procedures p on p.id=dep.procedure_id where ap.id=?";
 	public static final String getAppointmentsQueryInnerJoinMedicine = "select p.name from appointments ap inner join appointed_medicine dep on ap.id=dep.appointment_id inner join medicine p on p.id=dep.medicine_id where ap.id=?";
 	public static final String getAppointmentsQueryInnerJoinSurgeries = "select p.name from appointments ap inner join appointed_surgeries dep on ap.id=dep.appointment_id inner join surgeries p on p.id=dep.surgery_id where ap.id=?";
@@ -119,9 +86,45 @@ public class SQLUserDAO implements UserDAO {
 	public static final String getProcedureByAppointedProcedureId = "select * from procedures where id = (select procedure_id from appointed_procedures where appointment_id=?)";
 	public static final String getSurgeryByAppointedSurgeryId = "select * from surgeries where id = (select surgery_id from appointed_surgeries where appointment_id=?)";
 	public static final String getMedicineByAppointedMedicineId = "select * from medicine where id = (select medicine_id from appointed_medicine where appointment_id=?)";
+	public static final String changeLocaleSQLUpdate = "update users set language = ? where id = ?";
+	public static final String indicationsConst = "indications";
+	public static final String executorTypeConst = "executor_type";
+	public static final String completionStatusConst = "completion_status";	
+	public static final String loginDataIdConst = "login_data_id";
+	public static final String idConst = "id";
+	public static final String loginConst = "login";
+	public static final String passwordConst = "password";
+	public static final String typeConst = "type";
+	public static final String languageConst = "language";
+	public static final String nameConst = "name";
+	public static final String firstNameConst = "first_name";
+	public static final String lastNameConst = "last_name";
+	public static final String birthdateConst = "birthdate";
+	public static final String specialityConst = "speciality";
+	public static final String experienceConst = "experience";
+	public static final String admissionDateConst = "admission_date";
+	public static final String attendedDoctorIdConst = "attended_doctor_id";
+	public static final String dischargeStatusConst = "discharge_status";
+	public static final String medicineUpperCaseConst = "MEDICINE";
+	public static final String procedureUpperCaseConst = "PROCEDURE";
+	public static final String surgeryUpperCaseConst = "SURGERY";
+	public static final String medicineConst = "medicine";
+	public static final String proceduresConst = "procedures";
+	public static final String surgeryConst = "surgery";
+	public static final String patientIdConst = "patient_id";
+	public static final String nurseIdConst = "nurse_id";
+	public static final String doctorIdConst = "doctor_id";
+	public static final String dischargeDateConst = "discharge_date";
+	public static final String diagnosisConst = "diagnosis";
+	public static final String appointedDoctorIdConst = "appointed_doctor_id";	
 	public static final String descriptionConst = "description";
 	public static final String durationConst = "duration";
 	public static final String finalDiagnosisConst = "final_diagnosis";
+	public static final String defaultLanguageConst = "not defined";
+	public static final String userTypeDoctorUpperCase = "DOCTOR";
+	public static final String userTypeNurseUpperCase = "NURSE";
+	public static final String userTypePatientUpperCase = "PATIENT";
+	public static final String specializationTherapistUpperCase = "THERAPIST";	
 	private UserFactory factory = null;
 
 	private static Logger logger = LogManager.getLogger(SQLUserDAO.class);
@@ -170,7 +173,7 @@ public class SQLUserDAO implements UserDAO {
 			throw new DAOException(e);
 		} catch (InterruptedException e) {
 			throw new DAOException(e);
-		}finally {
+		} finally {
 			connectionPool.putConnection(connection);
 		}
 		return curingInfo;
@@ -214,8 +217,9 @@ public class SQLUserDAO implements UserDAO {
 		List<User> executors = new LinkedList<>();
 		for (User executor : users) {
 			String executorType = executor.getClass().getSimpleName().toUpperCase();
-			if (executorType.compareTo(userTypeNurseUpperCase) == 0 || (executorType.compareTo(userTypeDoctorUpperCase) == 0
-					&& ((Doctor) executor).getSpecialization().toUpperCase().compareTo(specializationTherapistUpperCase) != 0)) {
+			if (executorType.compareTo(userTypeNurseUpperCase) == 0
+					|| (executorType.compareTo(userTypeDoctorUpperCase) == 0 && ((Doctor) executor).getSpecialization()
+							.toUpperCase().compareTo(specializationTherapistUpperCase) != 0)) {
 				executors.add(executor);
 			}
 		}
@@ -249,7 +253,7 @@ public class SQLUserDAO implements UserDAO {
 			patientInfoSet.next();
 			int patientInfoId = patientInfoSet.getInt(idConst);
 			preparedStmt.close();
-			preparedStmt = connection.prepareStatement(insertAppointmentUpdate,	Statement.RETURN_GENERATED_KEYS);
+			preparedStmt = connection.prepareStatement(insertAppointmentUpdate, Statement.RETURN_GENERATED_KEYS);
 			userTypeStmt = connection.prepareStatement(getUserTypeQuery);
 			userTypeStmt.setInt(1, executorId);
 			ResultSet usersSet = userTypeStmt.executeQuery();
@@ -399,14 +403,13 @@ public class SQLUserDAO implements UserDAO {
 				patientStmt.setInt(1, appointmentsSet.getInt(patientIdConst));
 				ResultSet patientSet = patientStmt.executeQuery();
 				patientSet.next();
-				if(patientSet.getBoolean(dischargeStatusConst)) {
+				if (patientSet.getBoolean(dischargeStatusConst)) {
 					patientStmt.close();
 					continue;
 				}
 				appointment.setPatient((Patient) getUserById(patientSet.getInt(loginDataIdConst)));
 				patientSet.close();
-				PreparedStatement doctorStmt = connection
-						.prepareStatement(getDoctorIdByDoctorIdInfo);
+				PreparedStatement doctorStmt = connection.prepareStatement(getDoctorIdByDoctorIdInfo);
 				doctorStmt.setInt(1, appointmentsSet.getInt(appointedDoctorIdConst));
 				ResultSet doctorSet = doctorStmt.executeQuery();
 				doctorSet.next();
@@ -446,19 +449,17 @@ public class SQLUserDAO implements UserDAO {
 			while (appointmentsSet.next()) {
 				Appointment appointment = new Appointment();
 				int appointmentId = appointmentsSet.getInt(idConst);
-				PreparedStatement patientStmt = connection
-						.prepareStatement(getIdAndDischargeStatusFromPatients);
+				PreparedStatement patientStmt = connection.prepareStatement(getIdAndDischargeStatusFromPatients);
 				patientStmt.setInt(1, appointmentsSet.getInt(patientIdConst));
 				ResultSet patientSet = patientStmt.executeQuery();
 				patientSet.next();
-				if(patientSet.getBoolean(dischargeStatusConst)) {
+				if (patientSet.getBoolean(dischargeStatusConst)) {
 					patientStmt.close();
 					continue;
 				}
 				appointment.setPatient((Patient) getUserById(patientSet.getInt(loginDataIdConst)));
 				patientSet.close();
-				PreparedStatement doctorStmt = connection
-						.prepareStatement(getDoctorIdByDoctorIdInfo);
+				PreparedStatement doctorStmt = connection.prepareStatement(getDoctorIdByDoctorIdInfo);
 				doctorStmt.setInt(1, appointmentsSet.getInt(appointedDoctorIdConst));
 				ResultSet doctorSet = doctorStmt.executeQuery();
 				doctorSet.next();
@@ -489,27 +490,28 @@ public class SQLUserDAO implements UserDAO {
 	public void completeAppointment(int appointmentId) throws DAOException {
 		Connection connection = null;
 		PreparedStatement appointmentStmt = null;
+		try {
+			connection = connectionPool.getConnection();
+			appointmentStmt = connection.prepareStatement(changeCompletionStatusUpdate);
+			appointmentStmt.setInt(1, appointmentId);
+			appointmentStmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} catch (InterruptedException e) {
+			throw new DAOException(e);
+		} finally {
+			connectionPool.putConnection(connection);
 			try {
-				connection = connectionPool.getConnection();
-				appointmentStmt = connection.prepareStatement(changeCompletionStatusUpdate);
-				appointmentStmt.setInt(1, appointmentId);
-				appointmentStmt.executeUpdate();
+				appointmentStmt.close();
 			} catch (SQLException e) {
 				throw new DAOException(e);
-			} catch (InterruptedException e) {
-				throw new DAOException(e);
-			} finally {
-				connectionPool.putConnection(connection);
-				try {
-					appointmentStmt.close();
-				} catch (SQLException e) {
-					throw new DAOException(e);
-				}
 			}
+		}
 	}
-	
+
 	@Override
-	public void dischargePatient(int patientId, String diagnosis, String finalDiagnosis, Date currentDate) throws DAOException {
+	public void dischargePatient(int patientId, String diagnosis, String finalDiagnosis, Date currentDate)
+			throws DAOException {
 		Connection connection = null;
 		PreparedStatement dischargeStatement = null;
 		try {
@@ -531,9 +533,10 @@ public class SQLUserDAO implements UserDAO {
 			patientStmt.executeUpdate();
 			dischargeStatement.executeUpdate();
 			connection.commit();
-			Patient dischargedPatient = ((Patient)getUserById(patientId));
+			Patient dischargedPatient = ((Patient) getUserById(patientId));
 			dischargedPatient.setDischargeStatus(true);
-			dischargedPatient.setDischargeInfo(new PatientDischargeInfo(new java.util.Date(currentDate.getTime()), diagnosis, finalDiagnosis));
+			dischargedPatient.setDischargeInfo(new PatientDischargeInfo(
+					User.formatter.format(new java.util.Date(currentDate.getTime())), diagnosis, finalDiagnosis));
 			patientStmt.close();
 		} catch (SQLException e) {
 			throw new DAOException(e);
@@ -548,7 +551,7 @@ public class SQLUserDAO implements UserDAO {
 			}
 		}
 	}
-	
+
 	@Override
 	public void cancelAppointment(int appointmentId) throws DAOException {
 		Connection connection = null;
@@ -564,7 +567,7 @@ public class SQLUserDAO implements UserDAO {
 			throw new DAOException(e);
 		}
 	}
-	
+
 	@Override
 	public List<User> getTherapists() throws DAOException {
 		Connection connection = null;
@@ -574,7 +577,7 @@ public class SQLUserDAO implements UserDAO {
 			connection = connectionPool.getConnection();
 			therapistsStmt = connection.createStatement();
 			ResultSet therapistsSet = therapistsStmt.executeQuery(getTherapistsDBQuery);
-			while(therapistsSet.next()) {
+			while (therapistsSet.next()) {
 				therapists.add(getUserById(therapistsSet.getInt(idConst)));
 			}
 		} catch (SQLException e) {
@@ -591,7 +594,32 @@ public class SQLUserDAO implements UserDAO {
 		}
 		return therapists;
 	}
-	
+
+	@Override
+	public void changeUserLanguage(String userLocale, int userId) throws DAOException {
+		Connection connection = null;
+		PreparedStatement localeStmt = null;
+		try {
+			connection = connectionPool.getConnection();
+			localeStmt = connection.prepareStatement(changeLocaleSQLUpdate);
+			localeStmt.setString(1, userLocale);
+			localeStmt.setInt(2, userId);
+			localeStmt.executeUpdate();
+			getUserById(userId).setLanguage(userLocale);
+		} catch (SQLException e) {
+			throw new DAOException(e);
+		} catch (InterruptedException e) {
+			throw new DAOException(e);
+		} finally {
+			try {
+				connection.close();
+				localeStmt.close();
+			} catch (SQLException e) {
+				throw new DAOException(e);
+			}
+		}
+	}
+
 	private User getUserById(int userId) {
 		User result = null;
 		for (User user : users) {
@@ -648,18 +676,8 @@ public class SQLUserDAO implements UserDAO {
 			}
 			int appointeeId = appointee.getInt(loginDataIdConst);
 			int executorId = nurseExecutor.getInt(loginDataIdConst);
-			for (User user : users) {
-				if (user.getUserId() == appointeeId) {
-					appointment.setAppointee((Doctor) user);
-					break;
-				}
-			}
-			for (User user : users) {
-				if (user.getUserId() == executorId) {
-					appointment.setAppointmentExecutor(user);
-					break;
-				}
-			}
+			appointment.setAppointee((Doctor) getUserById(appointeeId));
+			appointment.setAppointmentExecutor(getUserById(executorId));
 			patientAppointments.add(appointment);
 			appointeeStmt.close();
 		}
@@ -694,18 +712,8 @@ public class SQLUserDAO implements UserDAO {
 			}
 			int appointeeId = appointee.getInt(loginDataIdConst);
 			int executorId = doctorExecutor.getInt(loginDataIdConst);
-			for (User user : users) {
-				if (user.getUserId() == appointeeId) {
-					appointment.setAppointee((Doctor) user);
-					break;
-				}
-			}
-			for (User user : users) {
-				if (user.getUserId() == executorId) {
-					appointment.setAppointmentExecutor(user);
-					break;
-				}
-			}
+			appointment.setAppointee((Doctor) getUserById(appointeeId));
+			appointment.setAppointmentExecutor(getUserById(executorId));
 			patientAppointments.add(appointment);
 			appointeeStmt.close();
 			doctorExecutor.close();
@@ -884,8 +892,8 @@ public class SQLUserDAO implements UserDAO {
 		factory = PatientFactory.getInstance();
 		while (usersSet.next()) {
 			ResultSet loginSet = getLoginDataFromUsers(activeStmt, con, usersSet.getInt(loginDataIdConst));
-			Patient patient = (Patient)factory.createUser(usersSet, loginSet);
-			if(usersSet.getBoolean(dischargeStatusConst)) {
+			Patient patient = (Patient) factory.createUser(usersSet, loginSet);
+			if (usersSet.getBoolean(dischargeStatusConst)) {
 				int patientIdInfo = usersSet.getInt(idConst);
 				PreparedStatement userDischargeInfoStmt = con.prepareStatement(getDischargeCuringInfoById);
 				userDischargeInfoStmt.setInt(1, patientIdInfo);
@@ -894,7 +902,8 @@ public class SQLUserDAO implements UserDAO {
 				Date dischargeDate = dischargeInfoSet.getDate(dischargeDateConst);
 				String diagnosis = dischargeInfoSet.getString(diagnosisConst);
 				String finalDiagnosis = dischargeInfoSet.getString(finalDiagnosisConst);
-				patient.setDischargeInfo(new PatientDischargeInfo(new java.util.Date(dischargeDate.getTime()), diagnosis, finalDiagnosis));
+				patient.setDischargeInfo(new PatientDischargeInfo(
+						User.formatter.format(new java.util.Date(dischargeDate.getTime())), diagnosis, finalDiagnosis));
 				userDischargeInfoStmt.close();
 			}
 			users.add(patient);
@@ -940,7 +949,7 @@ public class SQLUserDAO implements UserDAO {
 	}
 
 	private void createUser(String login, String password, String firstName, String lastName, Date birthdate,
-			Date admissionDate, int therapistId) throws DAOException{
+			Date admissionDate, int therapistId) throws DAOException {
 		Connection connection = null;
 		PreparedStatement insertUserStmt = null;
 		PreparedStatement insertPatientStmt = null;
@@ -972,7 +981,9 @@ public class SQLUserDAO implements UserDAO {
 			insertPatientStmt.setInt(5, therapistIdInfo);
 			insertPatientStmt.setInt(6, lastId);
 			insertPatientStmt.executeUpdate();
-			users.add(new Patient(lastId, login, password, firstName, lastName, birthdate, admissionDate, therapistIdInfo, false));
+
+			users.add(new Patient(lastId, login, password, defaultLanguageConst, firstName, lastName,
+					User.formatter.format(birthdate), User.formatter.format(admissionDate), therapistIdInfo, false));
 			connection.commit();
 		} catch (SQLException e) {
 			throw new DAOException(e);
@@ -1008,4 +1019,5 @@ public class SQLUserDAO implements UserDAO {
 		}
 		return existingUser;
 	}
+
 }

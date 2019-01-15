@@ -43,14 +43,13 @@ public class WebController extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Command command;
-		String commandParameter = request.getParameter("requestParameter");
+		String commandParameter = request.getParameter(Command.requestParameter);
 		System.out.println("Standart : " + commandParameter);
-		if(request.getSession(true).getAttribute("changeLocaleParameter") != null) {
-			String changeLocaleParameter = request.getSession(true).getAttribute("changeLocaleParameter").toString();
-			request.getSession(true).setAttribute("changeLocaleParameter", "");
+		if(request.getSession(true).getAttribute(Command.changeLocaleParameter) != null) {
+			String changeLocaleParameter = request.getSession(true).getAttribute(Command.changeLocaleParameter).toString();
+			request.getSession(true).removeAttribute(Command.changeLocaleParameter);
 			commandParameter = changeLocaleParameter.isEmpty() ? commandParameter : changeLocaleParameter;
 		}
-		System.out.println("Hidden parameter: " + commandParameter);
 		command = provider.getCommand(commandParameter);
 		try {
 			command.execute(request, response);

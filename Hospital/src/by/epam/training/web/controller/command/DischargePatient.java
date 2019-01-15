@@ -15,12 +15,12 @@ public class DischargePatient implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ServiceException {
-		String userId = request.getParameter("userId");
-		String diagnosis = request.getParameter("diagnosis");
-		String finalDiagnosis = request.getParameter("finalDiagnosis");		
+		String userId = request.getParameter(Command.userIdParameter);
+		String diagnosis = request.getParameter(Command.diagnosisParameter);
+		String finalDiagnosis = request.getParameter(Command.finalDiagnosisParameter);		
 		ClientService service = ServiceFactory.getInstance().getClientService();
 		service.dischargePatient(userId, diagnosis, finalDiagnosis);
-		response.getWriter().print("success");
+		response.getWriter().print(Command.successMessage);
 	}
 
 }

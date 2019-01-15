@@ -27,12 +27,13 @@ public class DoctorFactory implements UserFactory {
 		int userId = usersSet.getInt(SQLUserDAO.loginDataIdConst);
 		String userLogin = loginSet.getString(SQLUserDAO.loginConst);
 		String userPassword = loginSet.getString(SQLUserDAO.passwordConst);
+		String language = loginSet.getString(SQLUserDAO.languageConst);
 		String userFirstName = usersSet.getString(SQLUserDAO.firstNameConst);
 		String userLastName = usersSet.getString(SQLUserDAO.lastNameConst);
 		Date birthdate = usersSet.getDate(SQLUserDAO.birthdateConst);
 		String experience = usersSet.getString(SQLUserDAO.experienceConst);
 		String speciality = usersSet.getString(SQLUserDAO.specialityConst);
-		return new Doctor(userId, userLogin, userPassword, userFirstName, userLastName, birthdate, speciality, experience);
+		return new Doctor(userId, userLogin, userPassword, language, userFirstName, userLastName, User.formatter.format(birthdate), speciality, experience);
 	}
 
 }

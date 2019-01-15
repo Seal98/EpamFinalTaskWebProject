@@ -7,15 +7,20 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.epam.training.web.exception.ServiceException;
 import by.epam.training.web.service.ClientService;
 import by.epam.training.web.service.ServiceFactory;
 
 public class ConfirmReg implements Command {
 
+	private static Logger logger = LogManager.getLogger(ConfirmReg.class);
+	
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
-			throws ServiceException, ServletException, IOException {
+			throws ServletException, IOException {
 		RequestDispatcher dispatcher = null;
 		request.setAttribute(Command.answerAttribute, null);
 
@@ -32,15 +37,13 @@ public class ConfirmReg implements Command {
 		try {
 			String birthdate = request.getParameter(Command.birthDateParameter);
 			clientService.signUp(login, password, confirmedPassword, firstName, lastName, birthdate, therapistId);
-			//dispatcher = request.getRequestDispatcher(Command.mainPageJSP);
-			request.getSession(true).setAttribute(Command.answerAttribute, Command.registrationConfirmedMessage);
 			response.sendRedirect(Command.mainPageJSP);
-			request.getSession(true).setAttribute("currentPage", Command.mainPageJSP);
+			request.getSession(true).setAttribute(Command.currentPageParameter, Command.mainPageJSP);
 		} catch (ServiceException se) {
 			dispatcher = request.getRequestDispatcher(Command.signUpPageJSP);
-			request.getSession(true).setAttribute(Command.answerAttribute, se.getMessage());
+			request.setAttribute(Command.regMistakeMessageParameter, se.getMessage());
 			dispatcher.forward(request, response);
-			throw se;
+			logger.error(se);
 		}
 		
 	}

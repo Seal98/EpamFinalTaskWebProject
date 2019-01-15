@@ -1,27 +1,26 @@
 package by.epam.training.web.bean;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class Patient extends User implements Serializable {
 
 	private static final long serialVersionUID = 2267299134657869647L;
 
-	private Date admissionDate;
+	private String admissionDate;
 	private int attendedDoctorId;
 	private boolean dischargeStatus;
 	private PatientDischargeInfo dischargeInfo;
 
 	public Patient() {
 		super();
-		super.setUserType("Patient");
+		super.setUserType(User.patientConst);
 	}
 
-	public Patient(int userID, String login, String password, String firstName, String lastName, Date birthDate,
-			Date admissionDate, int attendedDoctorId, boolean dischargeStatus) {
-		super(userID, login, password, firstName, lastName, birthDate);
-		super.setUserType("Patient");
-		this.setAdmissionDate(new Date(admissionDate.getTime()));
+	public Patient(int userID, String login, String password, String language, String firstName, String lastName, String birthDate,
+			String admissionDate, int attendedDoctorId, boolean dischargeStatus) {
+		super(userID, login, password, language, firstName, lastName, birthDate);
+		super.setUserType(User.patientConst);
+		this.setAdmissionDate(admissionDate);
 		this.attendedDoctorId = attendedDoctorId;
 		this.dischargeStatus = dischargeStatus;
 	}
@@ -42,11 +41,11 @@ public class Patient extends User implements Serializable {
 		this.dischargeInfo = dischargeInfo;
 	}
 
-	public Date getAdmissionDate() {
+	public String getAdmissionDate() {
 		return admissionDate;
 	}
 
-	public void setAdmissionDate(Date admissionDate) {
+	public void setAdmissionDate(String admissionDate) {
 		this.admissionDate = admissionDate;
 	}
 
@@ -69,7 +68,7 @@ public class Patient extends User implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int result = super.hashCode() + (int) admissionDate.getTime() / 50000;
+		int result = super.hashCode() + admissionDate.compareTo(sampleHashcodeString);
 		return result;
 	}
 

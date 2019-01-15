@@ -24,7 +24,7 @@ public interface Command {
 	public static final String therapistParameter = "therapistParameter";
 	public static final String passwordConfirmParameter = "passwordConfirm";
 	public static final String registrationConfirmedMessage = "You have been registered";
-	public static final String wrongCommandMessage = "Wrong command";
+	public static final String wrongCommandMessage = "Something went wrong";
 	public static final String userType = "userType";
 	public static final String currentUser = "current_user";
 	public static final String patientUpperCase = "PATIENT";
@@ -43,6 +43,25 @@ public interface Command {
 	public static final String attendedDoctorFName = "attended_doctor_fname";
 	public static final String attendedDoctorLName = "attended_doctor_lname";
 	public static final String attendedDoctorSpecialization = "attended_doctor_specialization";
+	public static final String changeLocaleParameter = "changeLocaleParameter";
+	public static final String requestParameter = "requestParameter";
+	public static final String currentPageParameter = "currentPage";
+	public static final String localeParameter = "locale";
+	public static final String authorizationParameter = "authorization";
+	public static final String signInParameter = "SIGN_IN";
+	public static final String appointmentIdParameter = "appointmentId";
+	public static final String successMessage = "success";
+	public static final String patientIdParameter = "patientId";
+	public static final String executorIdParameter = "executorId";
+	public static final String treatmentTypeParameter = "selectedTreatmentType";
+	public static final String treatmentParameter = "selectedTreatment";
+	public static final String creationFailedMessage = "creation failed";
+	public static final String regMistakeMessageParameter = "regMistakeMessage";
+	public static final String userIdParameter = "userId";
+	public static final String diagnosisParameter = "diagnosis";
+	public static final String finalDiagnosisParameter = "finalDiagnosis";
+	public static final String therapistsParameter = "therapists";
+	public static final String notDefinedLanguage = "not defined";
 	
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ServiceException;
 }

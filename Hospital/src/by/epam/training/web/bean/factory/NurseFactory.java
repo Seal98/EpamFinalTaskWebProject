@@ -27,11 +27,12 @@ public class NurseFactory implements UserFactory {
 		int userId = usersSet.getInt(SQLUserDAO.loginDataIdConst);
 		String userLogin = loginSet.getString(SQLUserDAO.loginConst);
 		String userPassword = loginSet.getString(SQLUserDAO.passwordConst);
+		String language = loginSet.getString(SQLUserDAO.languageConst);
 		String userFirstName = usersSet.getString(SQLUserDAO.firstNameConst);
 		String userLastName = usersSet.getString(SQLUserDAO.lastNameConst);
 		Date birthdate = usersSet.getDate(SQLUserDAO.birthdateConst);
 		String experience = usersSet.getString(SQLUserDAO.experienceConst);
-		return new Nurse(userId, userLogin, userPassword, userFirstName, userLastName, birthdate, experience);
+		return new Nurse(userId, userLogin, userPassword, language, userFirstName, userLastName, User.formatter.format(birthdate), experience);
 	}
 
 }

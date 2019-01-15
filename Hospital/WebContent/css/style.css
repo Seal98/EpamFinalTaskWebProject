@@ -84,6 +84,11 @@ div.greenTable {
 	margin-left: 25%;
 }
 
+*{	
+	
+	text-shadow: 1px 1px 1px #c0c0c0;
+}
+
 .tableNameFont {
 	float: left;
 	width: 20%;
@@ -210,8 +215,17 @@ div.greenTable {
   z-index: 9;
 }
 
+.form-profile {
+  display: none;
+  position: fixed;
+  bottom: 50%;
+  left: 80%;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+}
+
 .form-container {
-  max-width: 300px;
+  max-width: 350px;
   padding: 10px;
   background-color: white;
 }

@@ -16,14 +16,14 @@ public class AppointmentCreator implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ServiceException {
 			ClientService service = ServiceFactory.getInstance().getClientService();
-			String patientId = request.getParameter("patientId");
-			String executorId = request.getParameter("executorId");
-			String selectedTreatmentType = request.getParameter("selectedTreatmentType");
-			String selectedTreatment = request.getParameter("selectedTreatment");
+			String patientId = request.getParameter(Command.patientIdParameter);
+			String executorId = request.getParameter(Command.executorIdParameter);
+			String selectedTreatmentType = request.getParameter(Command.treatmentTypeParameter);
+			String selectedTreatment = request.getParameter(Command.treatmentParameter);
 			String doctorId = request.getParameter(Command.doctorIdParameter).toString();
 			int appointmentId = service.createAppointment(patientId, executorId, selectedTreatmentType, selectedTreatment, doctorId);
 			if(appointmentId == -1) {
-				response.getWriter().print("creation failed");
+				response.getWriter().print(Command.creationFailedMessage);
 			} else {
 				response.getWriter().print(appointmentId);
 			}

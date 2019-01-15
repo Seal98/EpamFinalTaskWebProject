@@ -1,7 +1,6 @@
 package by.epam.training.web.bean;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class Nurse extends User implements Serializable {
 
@@ -11,12 +10,12 @@ public class Nurse extends User implements Serializable {
 	
 	public Nurse() {
 		super();
-		super.setUserType("Nurse");
+		super.setUserType(User.nurseConst);
 	}
 
-	public Nurse(int userID, String login, String password, String firstName, String lastName, Date birthDate, String experience) {
-		super(userID, login, password, firstName, lastName, birthDate);
-		super.setUserType("Nurse");
+	public Nurse(int userID, String login, String password, String language, String firstName, String lastName, String birthDate, String experience) {
+		super(userID, login, password, language, firstName, lastName, birthDate);
+		super.setUserType(User.nurseConst);
 		this.experience = experience;
 	}
 

@@ -14,7 +14,7 @@ public class BackToWelcomePage implements Command {
 		RequestDispatcher rd = request.getRequestDispatcher(Command.mainPageJSP);
 		request.setAttribute(Command.answerAttribute, null);
 		try {
-			request.getSession(true).setAttribute("currentPage", Command.mainPageJSP);
+			request.getSession(true).setAttribute(Command.currentPageParameter, Command.mainPageJSP);
 			rd.forward(request, response);
 		} catch (ServletException e) {
 			throw e;

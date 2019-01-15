@@ -41,7 +41,7 @@ public class ClientService {
 	public void signUp(String login, String password, String confirmedPassword, String firstName, String lastName,
 			String birthdateStr, String therapistId) throws ServiceException {
 		ValidatorResult result = ValidatorHelper.getUserValidator().userSignUpDataValidator(login, password,
-				confirmedPassword, firstName, lastName, therapistId);
+				confirmedPassword, firstName, lastName, therapistId, birthdateStr);
 		if (!result.isValid()) {
 			throw new ServiceException(result.getValidationMessage());
 		}
@@ -236,6 +236,20 @@ public class ClientService {
 			throw new ServiceException(e);
 		}	
 		return therapists;
+	}
+	
+	public void changeUserLocale(String userLocale, String userId) throws ServiceException {
+		FactoryDAO factoryDao = FactoryDAO.getInstance();
+		UserDAO userDao = factoryDao.getUserDAO();
+		ValidatorResult result = ValidatorHelper.getUserValidator().validateLocale(userLocale);
+		if(!result.isValid()) {
+			throw new ServiceException(result.getValidationMessage());
+		}
+		try {
+			userDao.changeUserLanguage(userLocale, Integer.parseInt(userId));
+		} catch(DAOException e) {
+			throw new ServiceException(e);
+		}
 	}
 	
 }

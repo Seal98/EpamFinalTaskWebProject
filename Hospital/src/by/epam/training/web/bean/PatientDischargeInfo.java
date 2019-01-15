@@ -7,7 +7,7 @@ public class PatientDischargeInfo implements Serializable {
 
 	private static final long serialVersionUID = -554758722344270457L;
 
-	private Date dischargeDate;
+	private String dischargeDate;
 	private String diagnosis;
 	private String finalDiagnosis;
 
@@ -15,17 +15,17 @@ public class PatientDischargeInfo implements Serializable {
 		super();
 	}
 
-	public PatientDischargeInfo(Date dischargeDate, String diagnosis, String finalDiagnosis) {
+	public PatientDischargeInfo(String dischargeDate, String diagnosis, String finalDiagnosis) {
 		this.dischargeDate = dischargeDate;
 		this.diagnosis = diagnosis;
 		this.finalDiagnosis = finalDiagnosis;
 	}
 	
-	public Date getDischargeDate() {
+	public String getDischargeDate() {
 		return dischargeDate;
 	}
 
-	public void setDischargeDate(Date dischargeDate) {
+	public void setDischargeDate(String dischargeDate) {
 		this.dischargeDate = dischargeDate;
 	}
 
@@ -65,7 +65,7 @@ public class PatientDischargeInfo implements Serializable {
 	@Override
 	public int hashCode() {
 		int result = 0;
-		result += dischargeDate.getTime();
+		result += dischargeDate.compareTo(User.sampleHashcodeString);
 		for (int i = 0; i < diagnosis.length(); i++) {
 			result += diagnosis.charAt(i) * 5;
 		}

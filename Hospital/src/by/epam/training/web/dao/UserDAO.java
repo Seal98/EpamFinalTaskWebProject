@@ -27,7 +27,7 @@ public interface UserDAO {
 	public List<User> getExecutors() throws DAOException;
 	
 	public List<MedicalTreatment> getMedicalTreatment();
-
+	
 	public int createAppointment(int patientId, int executorId, String treatmentType, String treatment, int doctorId) throws DAOException;
 
 	public List<Appointment> getTherapistAppointments(int therapistId) throws DAOException;
@@ -43,4 +43,6 @@ public interface UserDAO {
 	public void cancelAppointment(int appointmentId) throws DAOException;
 
 	public List<User> getTherapists() throws DAOException;
+
+	public void changeUserLanguage(String userLocale, int userId) throws DAOException;
 }

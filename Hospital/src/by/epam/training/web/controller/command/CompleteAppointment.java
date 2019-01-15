@@ -16,8 +16,8 @@ public class CompleteAppointment implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ServiceException {
 		ClientService service = ServiceFactory.getInstance().getClientService();
-		service.completeAppointment(request.getParameter("appointmentId"));
-		response.getWriter().print("success");
+		service.completeAppointment(request.getParameter(Command.appointmentIdParameter));
+		response.getWriter().print(Command.successMessage);
 	}
 
 }
