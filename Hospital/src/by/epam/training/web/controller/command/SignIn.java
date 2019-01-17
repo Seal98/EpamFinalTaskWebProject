@@ -16,6 +16,7 @@ import by.epam.training.web.bean.Doctor;
 import by.epam.training.web.bean.MedicalTreatment;
 import by.epam.training.web.bean.PatientCuringInfo;
 import by.epam.training.web.bean.User;
+import by.epam.training.web.controller.command.authorizer.UserAuthorizerProvider;
 import by.epam.training.web.exception.ServiceException;
 import by.epam.training.web.service.ClientService;
 import by.epam.training.web.service.ServiceFactory;
@@ -34,63 +35,27 @@ public class SignIn implements Command {
 			login = request.getSession(true).getAttribute(Command.loginParameter).toString();
 			password = request.getSession(true).getAttribute(Command.passwordParameter).toString();
 		}
-		RequestDispatcher rd = null;
 		try {
 			User existingUser = clientService.signIn(login, password);
-			request.getSession(true).setAttribute(Command.currentUser, existingUser);
-			String userType = existingUser.getClass().getSimpleName();
+			String userType = existingUser.getUserType();
 			request.setAttribute(Command.userType, userType);
-			request.getSession(true).setAttribute(Command.loginParameter, existingUser.getUserLogin());
-			request.getSession(true).setAttribute(Command.passwordParameter, existingUser.getUserPassword());
-			request.getSession(true).setAttribute(Command.idParameter, existingUser.getUserId());
-			if(existingUser.getLanguage().compareTo(Command.notDefinedLanguage) != 0) {
-				request.getSession(true).setAttribute(Command.localeParameter, existingUser.getLanguage());
-			}
-			if (userType.toUpperCase().compareTo(Command.patientUpperCase) == 0) {
-				PatientCuringInfo curingInfo = clientService.getUserInfo(existingUser.getUserId());
-				request.setAttribute(appointments, curingInfo.getAppointments());
-				linkAttendedDoctorInfo(request, curingInfo.getAttendedDoctor());
-				rd = request.getRequestDispatcher(patientPageJSP);
-				request.getSession(true).setAttribute(Command.currentPageParameter, Command.patientPageJSP);
-			} else if (userType.toUpperCase().compareTo(Command.doctorUpperCase) == 0) {
-				if(((Doctor)existingUser).getSpecialization().toUpperCase().compareTo(Command.therapistUpperCase) == 0) {
-					request.setAttribute(Command.attendedPatients, clientService.getAttendedPatients(existingUser.getUserId()));
-					request.setAttribute(Command.executors, clientService.getExecutors());
-					List<MedicalTreatment> treatment = clientService.getTreatment();
-					request.setAttribute(Command.medicine, clientService.getMedicine(treatment));
-					request.setAttribute(Command.procedures, clientService.getProcedures(treatment));
-					request.setAttribute(Command.surgeries, clientService.getSurgeries(treatment));
-					request.setAttribute(Command.appointments, clientService.getMadeAppointments(existingUser.getUserId()));
-					rd = request.getRequestDispatcher(Command.therapistPageJSP);
-					request.getSession(true).setAttribute(Command.currentPageParameter, Command.therapistPageJSP);
-				} else {
-					List<Appointment> appointments = clientService.getExecutorAppointments(existingUser.getUserId(), existingUser.getUserType());
-					request.setAttribute(Command.appointments, appointments);
-					rd = request.getRequestDispatcher(Command.executorPageJSP);
-					request.getSession(true).setAttribute(Command.currentPageParameter, Command.executorPageJSP);
-				}
-			} else if(userType.toUpperCase().compareTo(Command.nurseUpperCase) == 0) {
-				request.setAttribute(Command.appointments, clientService.getExecutorAppointments(existingUser.getUserId(), existingUser.getUserType()));
-				rd = request.getRequestDispatcher(Command.executorPageJSP);
-				request.getSession(true).setAttribute(Command.currentPageParameter, Command.executorPageJSP);
-			} else {
-				rd = request.getRequestDispatcher(Command.welcomePageJSP);
-				request.getSession(true).setAttribute(Command.currentPageParameter, Command.welcomePageJSP);
-			}
-
-			rd.forward(request, response);
+			setUserSessionParameters(request, existingUser);
+			UserAuthorizerProvider.getInstance().getAuthorizer(userType).signIn(request, response, existingUser);
 		} catch (ServiceException se) {
 			request.setAttribute(Command.answerAttribute, se.getMessage());
 			logger.error(se);
 			request.getRequestDispatcher(Command.mainPageJSP).forward(request, response);
-			
+		}
+	}
+
+	private void setUserSessionParameters(HttpServletRequest request, User existingUser) {
+		request.getSession(true).setAttribute(Command.currentUser, existingUser);
+		request.getSession(true).setAttribute(Command.loginParameter, existingUser.getUserLogin());
+		request.getSession(true).setAttribute(Command.passwordParameter, existingUser.getUserPassword());
+		request.getSession(true).setAttribute(Command.idParameter, existingUser.getUserId());
+		if(existingUser.getLanguage().compareTo(Command.notDefinedLanguage) != 0) {
+			request.getSession(true).setAttribute(Command.localeParameter, existingUser.getLanguage());
 		}
 	}
 	
-	private void linkAttendedDoctorInfo(HttpServletRequest request, User doctor) {
-		request.setAttribute(Command.attendedDoctorFName, doctor.getFirstName());
-		request.setAttribute(Command.attendedDoctorLName, doctor.getLastName());
-		request.setAttribute(Command.attendedDoctorSpecialization, ((Doctor) doctor).getSpecialization());
-	}
-
 }

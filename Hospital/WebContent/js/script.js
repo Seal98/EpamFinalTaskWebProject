@@ -173,7 +173,17 @@ function dischargePatient() {
 				rowElements[1].innerHTML = ln;
 				rowElements[2].innerHTML = bd;
 				rowElements[3].innerHTML = ad;
-				rowElements[4].innerHTML = new Date();
+				Date.prototype.timeFormatter = function() {
+					  var mm = this.getMonth() + 1;
+					  var dd = this.getDate();
+					  var hh = this.getHours();
+					  var min = this.getMinutes();
+					  return this.getFullYear()+"-"+
+					          (mm>9 ? '' : '0') + mm+"-"+
+					          (dd>9 ? '' : '0') + dd +
+					          " " + hh + ":" + min;
+					};
+				rowElements[4].innerHTML = new Date().timeFormatter();
 				rowElements[5].innerHTML = diagnosis;
 				rowElements[6].innerHTML = finalDiagnosis;
 				for (var j = 0; j < 7; j++) {

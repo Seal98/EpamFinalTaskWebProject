@@ -736,7 +736,6 @@ public class SQLUserDAO implements UserDAO {
 			throws SQLException {
 		PreparedStatement procedureStmt = connection.prepareStatement(getIdFromProceduresByName);
 		treatment = treatment.substring(0, 1).toUpperCase() + treatment.substring(1).toLowerCase();
-		System.out.println(treatment);
 		procedureStmt.setString(1, treatment);
 		ResultSet procedureIdSet = procedureStmt.executeQuery();
 		procedureIdSet.next();
@@ -753,7 +752,6 @@ public class SQLUserDAO implements UserDAO {
 			throws SQLException {
 		PreparedStatement surgeryStmt = connection.prepareStatement(getIdFromSurgeriesByName);
 		treatment = treatment.substring(0, 1).toUpperCase() + treatment.substring(1).toLowerCase();
-		System.out.println(treatment);
 		surgeryStmt.setString(1, treatment);
 		ResultSet procedureIdSet = surgeryStmt.executeQuery();
 		procedureIdSet.next();
@@ -770,7 +768,6 @@ public class SQLUserDAO implements UserDAO {
 			throws SQLException {
 		PreparedStatement medicineStmt = connection.prepareStatement(getIdFromMedicineByName);
 		treatment = treatment.substring(0, 1).toUpperCase() + treatment.substring(1).toLowerCase();
-		System.out.println(treatment);
 		medicineStmt.setString(1, treatment);
 		ResultSet procedureIdSet = medicineStmt.executeQuery();
 		procedureIdSet.next();
@@ -844,9 +841,7 @@ public class SQLUserDAO implements UserDAO {
 		Connection connection = null;
 		Statement activeStmt = null;
 		try {
-			System.out.println("Here");
 			connection = connectionPool.getConnection();
-			System.out.println(connection);
 			activeStmt = connection.createStatement();
 			loadDoctors(activeStmt, connection);
 			loadNurses(activeStmt, connection);
@@ -964,6 +959,7 @@ public class SQLUserDAO implements UserDAO {
 			ResultSet doctorSet = selectDoctorStmt.executeQuery();
 			doctorSet.next();
 			int therapistIdInfo = doctorSet.getInt(idConst);
+			selectDoctorStmt.close();
 			connection.setAutoCommit(false);
 			insertUserStmt = connection.prepareStatement(insertUserDBQuery, Statement.RETURN_GENERATED_KEYS);
 			insertUserStmt.setString(1, login);
@@ -973,6 +969,7 @@ public class SQLUserDAO implements UserDAO {
 			ResultSet result = insertUserStmt.getGeneratedKeys();
 			result.next();
 			int lastId = result.getInt(1);
+			insertUserStmt.close();
 			insertPatientStmt.setString(1, firstName);
 			insertPatientStmt.setString(2, lastName);
 			insertPatientStmt.setDate(3, birthdate);
@@ -980,7 +977,7 @@ public class SQLUserDAO implements UserDAO {
 			insertPatientStmt.setInt(5, therapistIdInfo);
 			insertPatientStmt.setInt(6, lastId);
 			insertPatientStmt.executeUpdate();
-
+			insertPatientStmt.close();
 			users.add(new Patient(lastId, login, password, defaultLanguageConst, firstName, lastName,
 					User.formatter.format(birthdate), User.formatter.format(admissionDate), therapistIdInfo, false));
 			connection.commit();
@@ -988,13 +985,6 @@ public class SQLUserDAO implements UserDAO {
 			throw new DAOException(e);
 		} finally {
 			connectionPool.putConnection(connection);
-			try {
-				insertPatientStmt.close();
-				selectDoctorStmt.close();
-				insertUserStmt.close();
-			} catch (SQLException e) {
-				throw new DAOException(e);
-			}
 		}
 	}
 

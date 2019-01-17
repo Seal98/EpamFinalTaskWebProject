@@ -100,7 +100,6 @@ public class ClientService {
 		UserDAO userDao = factoryDao.getUserDAO();
 		List<MedicalTreatment> treatment = null;
 		treatment = userDao.getMedicalTreatment();
-
 		return treatment;
 	}
 
@@ -146,7 +145,6 @@ public class ClientService {
 		int patientId = Integer.parseInt(patientIdStr.split("[a-zA-Z]+")[1]);
 		int executorId = Integer.parseInt(executorIdStr);
 		String treatmentType = treatmentTypeStr.split("Rb")[0];
-		System.out.println(doctorId);
 		try {
 			appointmentId = userDao.createAppointment(patientId, executorId, treatmentType, treatmentStr, Integer.parseInt(doctorId));
 		} catch (DAOException e) {
